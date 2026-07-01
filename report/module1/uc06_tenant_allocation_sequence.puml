@@ -1,0 +1,53 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "System Admin" as SysAdmin
+participant "Giao diện (Admin Panel)" as Web
+participant "IAM Service" as IAM
+participant "Email Service" as Email
+database "Database\n(Global Schema)" as DB
+
+SysAdmin -> Web : Nhập thông tin Tenant & Submit
+activate Web
+Web -> IAM : POST /api/tenants/provision
+activate IAM
+
+IAM -> DB : Kiểm tra tồn tại Subdomain
+activate DB
+DB --> IAM : Kết quả (True/False)
+deactivate DB
+
+alt Subdomain đã tồn tại
+    IAM --> Web : 409 Conflict
+    Web --> SysAdmin : Báo lỗi "Subdomain đã tồn tại"
+else Hợp lệ
+    IAM -> DB : Insert bản ghi Tenant mới vào Global DB
+    activate DB
+    DB --> IAM : Trả về Tenant_ID
+    deactivate DB
+    
+    IAM -> DB : Thực thi DDL: CREATE SCHEMA {tenant_id}
+    activate DB
+    DB --> IAM : OK
+    deactivate DB
+    
+    IAM -> DB : Insert tài khoản Tenant Admin vào Schema mới
+    activate DB
+    DB --> IAM : OK
+    deactivate DB
+    
+    IAM -> Email : Gọi API gửi Email kích hoạt tài khoản
+    activate Email
+    Email --> IAM : Đã đưa vào hàng đợi (Queued)
+    deactivate Email
+    
+    IAM --> Web : 201 Created
+    Web --> SysAdmin : Thông báo "Khởi tạo Tenant thành công"
+end
+
+deactivate IAM
+deactivate Web
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "System Admin" as SAdmin
+
+rectangle "Hệ thống IAM" {
+    usecase "UC06: Cấp phát Tenant" as UC06
+    usecase "Tạo Schema Database độc lập" as CreateSchema
+    usecase "Tạo tài khoản Admin mặc định" as CreateAdmin
+    usecase "Gửi Email thông báo" as SendEmail
+}
+
+SAdmin --> UC06
+UC06 ..> CreateSchema : <<include>>
+UC06 ..> CreateAdmin : <<include>>
+UC06 ..> SendEmail : <<include>>
+@enduml

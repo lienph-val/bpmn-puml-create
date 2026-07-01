@@ -1,0 +1,581 @@
+Khi xây dựng **hệ thống thông tin**, mỗi loại biểu đồ trong **BPMN, UML và các Diagram khác** đều có những quy tắc (rules) và ký hiệu (notation) riêng. Dưới đây là danh sách tổng hợp đầy đủ và có hệ thống.
+
+# 1. BPMN (Business Process Model and Notation)
+
+Business Process Model and Notation (BPMN)
+
+## 1.1. Flow Objects (Đối tượng luồng)
+
+### Event (Sự kiện)
+
+* Luôn biểu diễn bằng hình tròn.
+* Có 3 loại:
+
+  * Start Event (1 viền mỏng)
+  * Intermediate Event (2 viền)
+  * End Event (1 viền dày)
+
+Quy tắc:
+
+* Một Process phải có ít nhất một Start Event.
+* End Event là tùy chọn nhưng nên có.
+* Sequence Flow không được đi vào Start Event.
+* Sequence Flow không được đi ra từ End Event.
+
+---
+
+### Activity (Hoạt động)
+
+Biểu diễn bằng hình chữ nhật bo góc.
+
+Gồm:
+
+* Task
+* Sub-process
+* Call Activity
+
+Quy tắc:
+
+* Mỗi Activity nên có ít nhất một luồng vào và một luồng ra.
+* Sub-process có thể được mở rộng hoặc thu gọn.
+* Một Task không được chứa Task khác.
+
+---
+
+### Gateway (Cổng điều khiển)
+
+Biểu diễn bằng hình thoi.
+
+Các loại:
+
+#### Exclusive Gateway (XOR)
+
+* Chỉ chọn một nhánh.
+
+#### Parallel Gateway (AND)
+
+* Tất cả nhánh đều thực hiện.
+
+#### Inclusive Gateway (OR)
+
+* Một hoặc nhiều nhánh.
+
+#### Event-based Gateway
+
+* Phụ thuộc vào sự kiện xảy ra.
+
+Quy tắc:
+
+* Gateway dùng để chia (split) hoặc hợp (merge) luồng.
+* AND-Split nên đi kèm AND-Join.
+* XOR-Split nên đi kèm XOR-Merge.
+
+---
+
+## 1.2. Connecting Objects
+
+### Sequence Flow
+
+* Đường liền nét có mũi tên.
+* Chỉ kết nối các phần tử trong cùng Pool.
+
+### Message Flow
+
+* Đường nét đứt.
+* Chỉ dùng giữa các Pool khác nhau.
+* Không được dùng trong cùng Pool.
+
+### Association
+
+* Đường chấm.
+* Dùng để liên kết dữ liệu hoặc chú thích.
+
+---
+
+## 1.3. Swimlane
+
+### Pool
+
+* Đại diện cho một tổ chức hoặc hệ thống.
+
+### Lane
+
+* Đại diện cho phòng ban hoặc vai trò.
+
+Quy tắc:
+
+* Message Flow chỉ được đi giữa các Pool.
+* Sequence Flow không được đi qua các Pool.
+
+---
+
+## 1.4. Artifact
+
+* Data Object
+* Group
+* Annotation
+
+Quy tắc:
+
+* Không ảnh hưởng đến luồng điều khiển.
+* Chỉ dùng để giải thích.
+
+---
+
+# 2. UML (Unified Modeling Language)
+
+Unified Modeling Language (UML)
+
+UML gồm 14 loại biểu đồ.
+
+---
+
+# 2.1. Use Case Diagram
+
+## Thành phần
+
+* Actor
+* Use Case
+* System Boundary
+* Association
+* Include
+* Extend
+* Generalization
+
+## Quy tắc
+
+### Actor
+
+* Đại diện cho người hoặc hệ thống bên ngoài.
+* Không nằm trong System Boundary.
+
+### Use Case
+
+* Phải nằm trong System Boundary.
+* Tên bắt đầu bằng động từ.
+
+Ví dụ:
+
+* Đăng nhập
+* Đặt hàng
+* Thanh toán
+
+---
+
+### Association
+
+* Actor ↔ Use Case.
+
+---
+
+### Include
+
+* Bắt buộc thực hiện.
+
+Ví dụ:
+
+Thanh toán
+→ Include
+→ Xác thực người dùng.
+
+---
+
+### Extend
+
+* Chỉ xảy ra khi có điều kiện.
+
+Ví dụ:
+
+Mua hàng
+→ Extend
+→ Áp dụng mã giảm giá.
+
+---
+
+### Generalization
+
+* Kế thừa Actor hoặc Use Case.
+
+---
+
+# Quy tắc chung của Use Case
+
+1. Không kết nối Actor với Actor.
+2. Không kết nối Use Case với Use Case bằng Association.
+3. Include và Extend phải có hướng mũi tên.
+4. Use Case phải mô tả mục tiêu của người dùng.
+5. Không mô tả chi tiết xử lý bên trong.
+
+---
+
+# 2.2. Class Diagram
+
+## Thành phần
+
+* Class
+* Attribute
+* Method
+* Relationship
+
+---
+
+## Association
+
+* 1-1
+* 1-N
+* N-N
+
+Ví dụ:
+
+```
+Student ----- Course
+```
+
+---
+
+## Aggregation
+
+```
+Department ◇------ Employee
+```
+
+Quy tắc:
+
+* Employee vẫn tồn tại khi Department bị xóa.
+
+---
+
+## Composition
+
+```
+House ◆------ Room
+```
+
+Quy tắc:
+
+* Room mất khi House bị xóa.
+
+---
+
+## Generalization
+
+```
+Animal
+  ↑
+ Dog
+```
+
+---
+
+## Dependency
+
+```
+Class A -----> Class B
+```
+
+---
+
+# Quy tắc Class Diagram
+
+1. Tên Class viết hoa chữ đầu.
+2. Thuộc tính:
+
+   ```
+   -name:String
+   +age:int
+   ```
+3. Method:
+
+   ```
+   +login()
+   ```
+4. Không được tạo vòng kế thừa.
+5. Composition mạnh hơn Aggregation.
+6. Multiplicity phải rõ ràng.
+
+---
+
+# 2.3. Sequence Diagram
+
+## Thành phần
+
+* Actor
+* Object
+* Lifeline
+* Activation
+* Message
+
+---
+
+## Message
+
+### Synchronous
+
+* Người gửi chờ kết quả.
+
+### Asynchronous
+
+* Không chờ.
+
+### Return Message
+
+* Nét đứt.
+
+---
+
+## Combined Fragment
+
+* alt
+* opt
+* loop
+* par
+
+---
+
+# Quy tắc
+
+1. Thời gian đi từ trên xuống.
+2. Message luôn theo thứ tự thời gian.
+3. Lifeline không được quay ngược thời gian.
+4. Object phải được tạo trước khi sử dụng.
+5. Destroy nằm cuối Lifeline.
+
+---
+
+# 2.4. Activity Diagram
+
+Tương tự Flowchart.
+
+## Thành phần
+
+* Initial Node
+* Action
+* Decision
+* Merge
+* Fork
+* Join
+* Final Node
+
+---
+
+## Quy tắc
+
+1. Chỉ có một Initial Node (khuyến nghị).
+2. Final Node kết thúc toàn bộ tiến trình.
+3. Decision phải có điều kiện.
+4. Fork tạo song song.
+5. Join đồng bộ các luồng.
+
+---
+
+# 2.5. State Machine Diagram
+
+## Thành phần
+
+* State
+* Transition
+* Event
+* Guard
+* Action
+
+---
+
+## Quy tắc
+
+1. Có Initial State.
+2. State có thể có nhiều Transition.
+3. Guard nằm trong:
+
+   ```
+   [condition]
+   ```
+4. Không được có trạng thái cô lập.
+
+---
+
+# 2.6. Communication Diagram
+
+Quy tắc:
+
+* Tập trung vào quan hệ giữa Object.
+* Message phải đánh số:
+
+```
+1:
+1.1:
+1.2:
+```
+
+---
+
+# 2.7. Component Diagram
+
+## Quy tắc
+
+* Component là module triển khai.
+* Interface:
+
+  * Provided Interface (lollipop)
+  * Required Interface (socket)
+
+---
+
+# 2.8. Deployment Diagram
+
+## Quy tắc
+
+* Node là phần cứng hoặc môi trường chạy.
+* Artifact được triển khai trên Node.
+* Có thể mô tả:
+
+  * Server
+  * Database
+  * Cloud
+  * Mobile.
+
+---
+
+# 2.9. Package Diagram
+
+Quy tắc:
+
+* Package nhóm các phần tử liên quan.
+* Dependency giữa các Package phải rõ ràng.
+* Tránh phụ thuộc vòng.
+
+---
+
+# 2.10. Object Diagram
+
+Quy tắc:
+
+* Là snapshot của Class Diagram.
+* Đối tượng được viết:
+
+```
+object:Class
+```
+
+---
+
+# 2.11. Timing Diagram
+
+Quy tắc:
+
+* Trục ngang là thời gian.
+* Mô tả thay đổi trạng thái theo thời gian.
+
+---
+
+# 2.12. Interaction Overview Diagram
+
+Quy tắc:
+
+* Kết hợp Activity Diagram và Sequence Diagram.
+* Mỗi node có thể tham chiếu một Interaction.
+
+---
+
+# 2.13. Profile Diagram
+
+Quy tắc:
+
+* Dùng để mở rộng UML.
+* Sử dụng:
+
+  * Stereotype
+  * Tagged Value
+  * Constraint.
+
+---
+
+# 3. ERD (Entity Relationship Diagram)
+
+Entity Relationship Diagram (ERD)
+
+## Quy tắc
+
+### Entity
+
+* Tên là danh từ.
+* Dùng số ít.
+
+### Attribute
+
+* Primary Key.
+* Foreign Key.
+* Composite Attribute.
+* Derived Attribute.
+
+### Relationship
+
+* 1-1
+* 1-N
+* N-N
+
+### Chuẩn hóa
+
+* 1NF
+* 2NF
+* 3NF
+* BCNF
+
+---
+
+# 4. Flowchart
+
+## Quy tắc
+
+* Bắt đầu bằng Start.
+* Kết thúc bằng End.
+* Quy trình đi từ trên xuống dưới.
+* Decision có ít nhất 2 nhánh.
+* Tránh đường giao nhau.
+
+---
+
+# 5. DFD (Data Flow Diagram)
+
+## Thành phần
+
+* Process
+* Data Store
+* External Entity
+* Data Flow
+
+---
+
+## Quy tắc
+
+1. Không được truyền dữ liệu trực tiếp:
+
+   * Entity → Entity
+   * Data Store → Data Store
+   * Entity → Data Store
+
+2. Mọi Data Flow phải có tên.
+
+3. Process phải có:
+
+   * ít nhất 1 input
+   * ít nhất 1 output.
+
+---
+
+# Tóm tắt nhanh
+
+| Biểu đồ    | Mục đích                        |
+| ---------- | ------------------------------- |
+| BPMN       | Mô hình hóa quy trình nghiệp vụ |
+| Use Case   | Yêu cầu chức năng               |
+| Class      | Thiết kế cấu trúc               |
+| Sequence   | Tương tác theo thời gian        |
+| Activity   | Luồng công việc                 |
+| State      | Vòng đời đối tượng              |
+| Component  | Kiến trúc module                |
+| Deployment | Triển khai hệ thống             |
+| ERD        | Thiết kế CSDL                   |
+| DFD        | Luồng dữ liệu                   |
+| Flowchart  | Thuật toán/quy trình            |
+
+Đây là bộ quy tắc nền tảng thường được sử dụng trong các môn **Phân tích thiết kế hệ thống**, **Cơ sở dữ liệu**, **Phân tích nghiệp vụ (BA)** và **Software Engineering**.

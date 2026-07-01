@@ -1,0 +1,37 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên|
+start
+:Nhập từ khóa tìm kiếm \nlên thanh công cụ Search;
+:Chọn mở một tài liệu \ntừ danh sách kết quả;
+
+|Hệ thống E-Office (Wiki)|
+:Kiểm tra quyền truy cập \ntài liệu của User;
+if (User có quyền \nxem tài liệu?) then (Không)
+    :Chặn truy cập và \nSinh lỗi phân quyền;
+    |Nhân viên|
+    :Hiển thị lỗi "Không \ncó quyền truy cập";
+else (Có)
+    |Hệ thống E-Office (Wiki)|
+    :Tải toàn văn tài liệu \nvà lịch sử Chatter;
+    |Nhân viên|
+    :Nhập nội dung Bình luận \n(Có kèm @Tag đồng nghiệp);
+    :Nhấn gửi Bình luận;
+    |Hệ thống E-Office (Wiki)|
+    :Lưu trữ Comment gắn \nliền với Document_ID;
+    if (Có tag (@Mention) \nđồng nghiệp không?) then (Có)
+        :Gửi Notification cho \nngười được nhắc đến;
+    else (Không)
+    endif
+    :Cập nhật hiển thị \nComment qua WebSocket;
+    |Nhân viên|
+    :Bình luận xuất hiện \ntrên luồng Chatter;
+endif
+
+stop
+@enduml

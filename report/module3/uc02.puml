@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Quản trị viên Nhân sự\n(HR Admin)" as HR
+
+rectangle "Hệ thống HRM" {
+    usecase "UC02: Quản lý Hợp đồng lao động" as UC02
+    usecase "Soạn thảo/Cập nhật Hợp đồng" as UpdateContract
+    usecase "Kiểm tra ràng buộc ngày tháng" as CheckDate
+    usecase "Xuất file Hợp đồng PDF" as ExportPDF
+}
+
+HR --> UC02
+UC02 ..> UpdateContract : <<include>>
+UpdateContract ..> CheckDate : <<include>>
+ExportPDF ..> UpdateContract : <<extend>>
+@enduml

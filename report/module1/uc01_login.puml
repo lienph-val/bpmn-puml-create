@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Người dùng" as User
+
+rectangle "Hệ thống IAM" {
+    usecase "UC01: Đăng nhập" as UC01
+    usecase "Xác thực Mật khẩu" as Auth
+    usecase "Kiểm tra trạng thái Tenant" as CheckTenant
+    usecase "UC03: Quên mật khẩu" as UC03
+}
+
+User --> UC01
+UC01 ..> Auth : <<include>>
+UC01 ..> CheckTenant : <<include>>
+UC03 ..> UC01 : <<extend>>
+@enduml

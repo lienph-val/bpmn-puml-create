@@ -1,0 +1,30 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype polyline
+skinparam DefaultFontName Arial
+left to right direction
+
+' Định nghĩa các Actor và ép thẳng hàng dọc ngăn nắp bên trái
+actor "System Admin" as SAdmin
+actor "Người dùng" as User
+actor "Tenant Admin" as TAdmin
+
+' Thiết lập trục kế thừa chuẩn (con nằm dưới cha, mũi tên hướng lên)
+User <|-- TAdmin
+SAdmin -[hidden]down-> User
+User -[hidden]down-> TAdmin
+
+rectangle "Hệ thống Enterprise Back Office" {
+    usecase "Quản trị Định danh & Phân quyền" as UC_IAM
+    usecase "Quản lý Tài chính" as UC_FIN
+    usecase "Quản trị Nhân sự" as UC_HRM
+}
+
+' Các đường kết nối song song, rõ ràng và không bị chồng chéo
+SAdmin --> UC_IAM
+User --> UC_IAM
+User --> UC_FIN
+TAdmin --> UC_HRM
+@enduml

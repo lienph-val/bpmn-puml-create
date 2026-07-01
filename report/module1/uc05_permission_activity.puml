@@ -1,0 +1,29 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Tenant Admin|
+start
+:Truy cập danh sách nhân sự;
+:Chọn nhân sự cần phân quyền;
+:Tích chọn các Role (Vai trò) tương ứng;
+:Nhấn "Lưu cấu hình";
+
+|Hệ thống IAM|
+if (Có bị xung đột quyền không?) then (Có)
+    :Sinh cảnh báo lỗi xung đột;
+    |Tenant Admin|
+    :Hiển thị lỗi "Cấp quyền đối lập";
+else (Không)
+    |Hệ thống IAM|
+    :Cập nhật bảng ánh xạ User_Role;
+    :Ghi vết vào Audit Log;
+    |Tenant Admin|
+    :Hiển thị thông báo "Phân quyền thành công";
+endif
+
+stop
+@enduml

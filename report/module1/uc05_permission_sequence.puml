@@ -1,0 +1,43 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Tenant Admin" as Admin
+participant "Giao diện (Web)" as Web
+participant "IAM Service" as IAM
+database "Database\n(Tenant Schema)" as DB
+
+Admin -> Web : Chọn User, gán Roles & Submit
+activate Web
+Web -> IAM : POST /api/roles/assign {userId, roleIds}
+activate IAM
+
+IAM -> IAM : Rule: Kiểm tra Xung đột quyền lợi (Conflict)
+alt Nếu có xung đột
+    IAM --> Web : 400 Bad Request
+    Web --> Admin : Hiển thị lỗi đỏ "Xung đột quyền lợi"
+else Nếu hợp lệ
+    IAM -> DB : DELETE các Role cũ của User
+    activate DB
+    DB --> IAM : OK
+    deactivate DB
+    
+    IAM -> DB : INSERT các Role mới (User_Role)
+    activate DB
+    DB --> IAM : OK
+    deactivate DB
+    
+    IAM -> DB : INSERT sự kiện vào Audit_Log
+    activate DB
+    DB --> IAM : OK
+    deactivate DB
+    
+    IAM --> Web : 200 OK (Thành công)
+    Web --> Admin : Hiển thị thông báo "Phân quyền thành công"
+end
+
+deactivate IAM
+deactivate Web
+@enduml

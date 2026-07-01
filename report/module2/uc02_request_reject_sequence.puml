@@ -1,0 +1,48 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Nhân viên" as User
+actor "Người duyệt\n(Manager)" as Manager
+participant "Giao diện (Web/App)" as UI
+participant "Workflow Engine" as Engine
+database "Cơ sở dữ liệu\n(Database)" as DB
+
+== Xét duyệt và Thực thi Từ chối ==
+Manager -> UI : Xem chi tiết đơn, nhập lý do và nhấn "Từ chối"
+activate UI
+
+UI -> Engine : POST /api/v1/requests/{id}/process {action="REJECT", comment="Lý do..."}
+activate Engine
+
+Engine -> DB : Kiểm tra tính hợp lệ và quyền hạn của Người duyệt
+activate DB
+DB --> Engine : Quyền duyệt hợp lệ (Authorized)
+deactivate DB
+
+Engine -> DB : UPDATE trạng thái thực thể đơn status = REJECTED
+activate DB
+DB --> Engine : Cập nhật thành công
+deactivate DB
+
+Engine -> DB : INSERT lý do hủy đơn và mốc thời gian vào bảng Audit_Log
+activate DB
+DB --> Engine : Lưu log thành công
+deactivate DB
+
+Engine -> DB : Cập nhật tăng bộ đếm đơn bị Từ chối trên bảng chỉ số Dashboard
+activate DB
+DB --> Engine : Đồng bộ thành công
+deactivate DB
+
+Engine -> Engine : Hủy bỏ/Xóa bỏ toàn bộ lịch trình các node định tuyến phía sau
+
+Engine --> UI : Trả mã kết quả kết xuất HTTP 200 OK
+UI --> Manager : Hiển thị thông báo hệ thống "Đã từ chối đề xuất vĩnh viễn"
+
+UI -> User : Đẩy Notification/Email thông báo đơn bị hủy kèm lý do cụ thể
+deactivate Engine
+deactivate UI
+@enduml

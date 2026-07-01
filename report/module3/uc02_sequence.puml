@@ -1,0 +1,50 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "HR Admin" as HR
+participant "Giao diện (HRM Web)" as UI
+participant "HRM Service" as CoreHR
+participant "Document Engine" as DocEngine
+database "Cơ sở dữ liệu\n(Database)" as DB
+
+HR -> UI : Nhập thông tin Hợp đồng & Submit
+activate UI
+
+UI -> CoreHR : POST /api/v1/contracts/create
+activate CoreHR
+
+CoreHR -> CoreHR : Validate Rule: EndDate > StartDate
+alt Logic ngày tháng sai
+    CoreHR --> UI : 422 Unprocessable Entity
+    UI --> HR : Hiển thị lỗi đỏ báo sai mốc thời gian
+else Hợp lệ
+    CoreHR -> DB : INSERT INTO Contracts (User_ID, Dates, Salary)
+    activate DB
+    DB --> CoreHR : Success (Contract_ID)
+    deactivate DB
+    
+    CoreHR -> DB : Ghi log cập nhật hồ sơ (Audit_Log)
+    activate DB
+    DB --> CoreHR : OK
+    deactivate DB
+    
+    opt Nếu HR chọn "Xuất file Hợp đồng PDF"
+        CoreHR -> DocEngine : Gửi Payload Data {Tên, Lương, Thời hạn}
+        activate DocEngine
+        DocEngine -> DocEngine : Ánh xạ (Binding) vào Template Hợp đồng
+        DocEngine --> CoreHR : Trả về File Binary/URL
+        deactivate DocEngine
+        CoreHR --> UI : Trả mã 201 Created + URL Tải file
+        UI -> HR : Tự động tải file PDF xuống máy
+    end
+    
+    CoreHR --> UI : Trả mã 200 OK
+    UI --> HR : Hiển thị thông báo "Cập nhật Hợp đồng thành công"
+end
+
+deactivate CoreHR
+deactivate UI
+@enduml

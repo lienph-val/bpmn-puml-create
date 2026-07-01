@@ -1,0 +1,36 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|HR Admin|
+start
+:Kéo thẻ ứng viên sang \ncột "Tiếp nhận (Onboarding)";
+:Nhập bổ sung thông tin \n chức vụ, phòng ban;
+:Nhấn "Xác nhận tiếp nhận";
+
+|Hệ thống HRM|
+if (Kiểm tra CCCD/Email \ncó bị trùng lặp không?) then (Có)
+    :Sinh cảnh báo lỗi;
+    |HR Admin|
+    :Hiển thị lỗi "Dữ liệu \n định danh đã tồn tại";
+else (Không)
+    |Hệ thống HRM|
+    if (Giới hạn tài khoản \n Tenant còn trống?) then (Không)
+        :Sinh cảnh báo \n hết hạn mức;
+        |HR Admin|
+        :Hiển thị lỗi "Vượt quá gói \n tài khoản SaaS";
+    else (Có)
+        |Hệ thống HRM|
+        :Khởi tạo hồ sơ nhân viên \n bản cứng số hóa (Active);
+        :Gọi API đồng bộ sang \n module IAM tạo tài khoản;
+        :Gửi Email Welcome kèm \n thông tin đăng nhập;
+        |HR Admin|
+        :Hiển thị thông báo \n "Tiếp nhận nhân sự thành công";
+    endif
+endif
+
+stop
+@enduml

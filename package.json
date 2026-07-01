@@ -1,0 +1,19 @@
+{
+  "name": "diagram-viewer",
+  "version": "1.0.0",
+  "description": "BPMN and UML Diagram Viewer",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "bpmn-js": "^17.7.1",
+    "plantuml-encoder": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.8"
+  }
+}

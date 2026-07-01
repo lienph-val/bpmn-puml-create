@@ -1,0 +1,28 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Nhân viên" as User
+actor "Văn thư" as Admin
+actor "Giám đốc" as Director
+
+User <|-- Admin
+User <|-- Director
+
+rectangle "Module Truyền Thông & Tài Liệu" {
+    usecase "UC01: Quản lý và Ban hành Công văn" as UC01
+    usecase "UC02: Tra cứu và Thảo luận nội bộ" as UC02
+    usecase "UC03: Quản lý Danh mục Kho Wiki" as UC03
+    usecase "UC04: Ghi Bút phê chỉ đạo" as UC04
+}
+
+Admin --> UC01
+Admin --> UC03
+
+User --> UC02
+
+Director --> UC04
+@enduml

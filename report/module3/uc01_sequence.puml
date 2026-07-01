@@ -1,0 +1,53 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "HR Admin" as HR
+participant "Giao diện (HRM Web)" as UI
+participant "HRM Service" as CoreHR
+participant "IAM Service" as IAM
+database "Cơ sở dữ liệu\n(Database)" as DB
+
+HR -> UI : Cập nhật trạng thái ứng viên & Submit form
+activate UI
+
+UI -> CoreHR : POST /api/v1/employees/onboard
+activate CoreHR
+
+CoreHR -> DB : SELECT COUNT(*) FROM Employees WHERE cccd = ?
+activate DB
+DB --> CoreHR : Trả về số lượng bản ghi
+deactivate DB
+
+alt Tồn tại CCCD (Trùng lặp)
+    CoreHR --> UI : 409 Conflict
+    UI --> HR : Hiển thị lỗi "CCCD đã tồn tại trong hệ thống"
+else Dữ liệu hợp lệ
+    CoreHR -> DB : INSERT INTO Employees (Trạng thái: ACTIVE)
+    activate DB
+    DB --> CoreHR : Success (Trả về Employee_ID mới)
+    deactivate DB
+    
+    CoreHR -> IAM : gRPC Call: /iam/create-account {email, tenantId}
+    activate IAM
+    IAM -> DB : INSERT INTO Users
+    activate DB
+    DB --> IAM : Success
+    deactivate DB
+    IAM --> CoreHR : Account_Created_OK
+    deactivate IAM
+    
+    CoreHR -> DB : Ghi log sự kiện Onboarding (Audit Log)
+    activate DB
+    DB --> CoreHR : OK
+    deactivate DB
+    
+    CoreHR --> UI : 201 Created
+    UI --> HR : Hiển thị thông báo "Onboarding hoàn tất"
+end
+
+deactivate CoreHR
+deactivate UI
+@enduml

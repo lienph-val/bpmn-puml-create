@@ -1,0 +1,32 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Kế toán / C&B|
+start
+:Chọn kỳ công và nhấn "Tổng hợp";
+
+|Hệ thống Chấm công|
+:Truy xuất Raw Logs từ Cơ sở dữ liệu;
+:Đối chiếu thời gian với lịch Ca làm việc;
+:Kết nối hệ thống lấy các đơn nghỉ phép đã duyệt;
+:Hợp nhất dữ liệu tính ra số công chuẩn;
+
+if (Có lỗi xung đột giữa Đi làm và Xin nghỉ?) then (Có)
+    :Sinh cảnh báo Highlight lỗi;
+    |Kế toán / C&B|
+    :Can thiệp đối soát \nthủ công;
+else (Không)
+    |Kế toán / C&B|
+endif
+
+:Rà soát kết quả và nhấn "Chốt bảng công";
+|Hệ thống Chấm công|
+:Khóa dữ liệu (Freeze) không cho sửa đổi;
+:Cập nhật trạng thái Sẵn sàng tính lương;
+
+stop
+@enduml

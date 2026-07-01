@@ -1,0 +1,47 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Người dùng" as User
+participant "Giao diện (Web/App)" as Frontend
+participant "IAM Service" as IAM
+database "Cơ sở dữ liệu\n(Database)" as DB
+
+User -> Frontend : Nhập Email, Password & Submit
+activate Frontend
+
+Frontend -> IAM : POST /api/auth/login
+activate IAM
+
+IAM -> DB : Truy vấn User & Tenant bằng Email
+activate DB
+DB --> IAM : Trả về dữ liệu (Tenant_Status, Hashed Pass)
+deactivate DB
+
+alt Tenant bị khóa HOẶC Sai tài khoản
+    IAM -> DB : Cập nhật Failed_Attempts + 1
+    activate DB
+    DB --> IAM : Success
+    deactivate DB
+    IAM --> Frontend : 401 Unauthorized / 403 Forbidden
+    Frontend --> User : Hiển thị cảnh báo lỗi tương ứng
+
+else Đăng nhập thành công
+    IAM -> IAM : Verify Password Hash (Bcrypt)
+    IAM -> DB : Cập nhật Last_Login & Ghi Audit Log
+    activate DB
+    DB --> IAM : Success
+    deactivate DB
+    
+    IAM -> IAM : Generate JWT Access Token
+    IAM --> Frontend : 200 OK + { JWT Token }
+    
+    Frontend -> Frontend : Lưu Token vào LocalStorage
+    Frontend --> User : Điều hướng tới Dashboard
+end
+
+deactivate IAM
+deactivate Frontend
+@enduml

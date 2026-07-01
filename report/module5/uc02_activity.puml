@@ -1,0 +1,34 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên|
+start
+:Tạo Đơn Hoàn ứng \nvà Tải ảnh Hóa đơn;
+
+|Hệ thống Tài chính (OCR)|
+:Quét ảnh và nhận diện \nKý tự quang học (OCR);
+if (Đọc được dữ liệu \nthành công?) then (Có)
+    :Tự động điền dữ liệu \nvào Form biểu mẫu;
+else (Không)
+    :Mở Form trống cho \nnhập liệu thủ công;
+endif
+
+|Nhân viên|
+:Kiểm tra lại dữ liệu \nvà nhấn "Gửi duyệt";
+
+|Kế toán viên|
+:Nhận đơn đã duyệt \nvà Kiểm tra chứng từ;
+:Chọn Khoản tạm ứng \ntrước đó (Nếu có);
+:Nhấn "Ghi nhận Chi phí \n& Đối soát";
+
+|Hệ thống Tài chính (OCR)|
+:Sinh bút toán Chi phí;
+:Cấn trừ Công nợ tạm ứng;
+:Khóa chứng từ và \ncập nhật Báo cáo P&L;
+
+stop
+@enduml

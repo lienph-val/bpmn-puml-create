@@ -1,0 +1,43 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Văn thư" as Admin
+participant "Giao diện (Web)" as UI
+participant "E-Office Service" as OfficeSvc
+participant "Storage (S3/MinIO)" as Storage
+database "Cơ sở dữ liệu" as DB
+
+Admin -> UI : Điền thông tin, Upload File & Submit
+activate UI
+
+UI -> OfficeSvc : POST /api/v1/documents/publish (FormData)
+activate OfficeSvc
+
+OfficeSvc -> Storage : Gửi File Binary để lưu trữ
+activate Storage
+Storage --> OfficeSvc : Trả về File_URL an toàn
+deactivate Storage
+
+OfficeSvc -> DB : Truy vấn cấu hình Số tự tăng (Sequence)
+activate DB
+DB --> OfficeSvc : Current_Number
+deactivate DB
+
+OfficeSvc -> OfficeSvc : Sinh Mã Công Văn (Generated_ID)
+
+OfficeSvc -> DB : INSERT bản ghi Document (Status: PUBLISHED)
+activate DB
+DB --> OfficeSvc : Success
+deactivate DB
+
+OfficeSvc -> DB : Ghi Log Ban hành (Audit)
+OfficeSvc -> DB : INSERT Queue gửi Notification cho Danh sách nhận
+OfficeSvc --> UI : 201 Created + Document_ID
+
+UI --> Admin : Hiển thị màn hình "Ban hành thành công"
+deactivate OfficeSvc
+deactivate UI
+@enduml

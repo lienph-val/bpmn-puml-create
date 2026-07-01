@@ -1,0 +1,45 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Kế toán" as Acc
+participant "Giao diện (Finance Web)" as UI
+participant "Finance Service" as FinEngine
+database "Database\n(Tenant DB)" as DB
+
+Acc -> UI : Chọn Đơn tạm ứng và nhấn "Xác nhận Chi tiền"
+activate UI
+
+UI -> FinEngine : POST /api/v1/finance/disburse {requestId}
+activate FinEngine
+
+FinEngine -> DB : Truy vấn kiểm tra Trạng thái Đơn
+activate DB
+DB --> FinEngine : Trạng thái = APPROVED
+deactivate DB
+
+FinEngine -> DB : UPDATE Request status = DISBURSED
+activate DB
+DB --> FinEngine : OK
+deactivate DB
+
+FinEngine -> FinEngine : Logic: Tạo cấu trúc Bút toán kép (Double-entry)
+
+FinEngine -> DB : INSERT INTO Ledger_Entries (Nợ TK 141, Có TK 112, Số tiền)
+activate DB
+DB --> FinEngine : OK (Mã bút toán)
+deactivate DB
+
+FinEngine -> DB : Ghi nhận lịch sử (Audit Log)
+activate DB
+DB --> FinEngine : OK
+deactivate DB
+
+FinEngine --> UI : Trả mã 200 OK
+UI --> Acc : Hiển thị thông báo "Đã chi tiền và ghi sổ thành công"
+
+deactivate FinEngine
+deactivate UI
+@enduml

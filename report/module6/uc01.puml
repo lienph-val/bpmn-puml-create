@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Văn thư" as Admin
+
+rectangle "Hệ thống E-Office" {
+    usecase "UC01: Ban hành Công văn" as UC01
+    usecase "Tự động cấp Số công văn" as AutoNum
+    usecase "Phân phối thông báo (Push/Email)" as Notify
+    usecase "Đính chính/Thu hồi" as Revoke
+}
+
+Admin --> UC01
+UC01 ..> AutoNum : <<include>>
+UC01 ..> Notify : <<include>>
+Revoke ..> UC01 : <<extend>>
+@enduml

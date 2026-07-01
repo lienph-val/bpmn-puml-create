@@ -1,0 +1,32 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Nhân viên" as User
+actor "Kế toán viên" as Accountant
+actor "CFO / Kế toán trưởng" as CFO
+
+User <|-- Accountant
+
+rectangle "Module Quản Trị Tài Chính Nội Bộ" {
+    usecase "UC01: Quản lý Tạm ứng và Chi tiền" as UC01
+    usecase "UC02: Thanh toán/Hoàn ứng (OCR)" as UC02
+    usecase "UC03: Thiết lập Ngân sách" as UC03
+    usecase "UC04: Xem Báo cáo P&L và Sổ cái" as UC04
+    usecase "UC05: Quản lý Danh mục TK Kế toán" as UC05
+}
+
+User --> UC01
+User --> UC02
+
+Accountant --> UC01
+Accountant --> UC02
+Accountant --> UC04
+Accountant --> UC05
+
+CFO --> UC03
+CFO --> UC04
+@enduml

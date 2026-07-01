@@ -1,0 +1,55 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Nhân viên (User 1)" as User1
+participant "Giao diện (Web UI)" as UI
+participant "Wiki & Chat Service" as ChatSvc
+participant "Elasticsearch" as Search
+database "Cơ sở dữ liệu" as DB
+
+== Tìm kiếm và Mở Tài liệu ==
+User1 -> UI : Gõ từ khóa "Quy trình xin nghỉ"
+activate UI
+UI -> Search : GET /search?q=Quy trình xin nghỉ
+activate Search
+Search --> UI : JSON List (Kết quả tìm kiếm)
+deactivate Search
+
+User1 -> UI : Click mở Tài liệu [Doc_123]
+UI -> ChatSvc : GET /api/v1/wiki/docs/123
+activate ChatSvc
+ChatSvc -> DB : Check Access Right (Role/Permission)
+activate DB
+DB --> ChatSvc : OK (Has Access)
+deactivate DB
+ChatSvc --> UI : Document Data + Chatter History
+deactivate ChatSvc
+UI --> User1 : Render Document View
+
+== Thảo luận và Tag đồng nghiệp ==
+User1 -> UI : Gõ comment "@User2 xác nhận nhé" & Submit
+UI -> ChatSvc : POST /api/v1/chatter/comments {docId, text, mentions=[User2]}
+activate ChatSvc
+
+ChatSvc -> DB : INSERT INTO Comments (Doc_ID, User1_ID, Content)
+activate DB
+DB --> ChatSvc : Comment_ID
+deactivate DB
+
+ChatSvc -> ChatSvc : Phân tích mảng Mentions
+
+alt Có User được Tag
+    ChatSvc -> DB : INSERT Notification (To: User2, Type: MENTION, Link: Doc_123)
+    activate DB
+    DB --> ChatSvc : OK
+    deactivate DB
+end
+
+ChatSvc -> UI : WebSocket: Broadcast New_Comment
+UI --> User1 : Render Comment tức thì trên màn hình
+deactivate ChatSvc
+deactivate UI
+@enduml

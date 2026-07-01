@@ -1,0 +1,83 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Nhân viên" as User
+actor "Người duyệt\n(Manager)" as Manager
+participant "Giao diện (Web/App)" as UI
+participant "Workflow Engine" as Engine
+database "Cơ sở dữ liệu\n(Database)" as DB
+
+== Khởi tạo và Gửi đề xuất ==
+User -> UI : Điền form động và nhấn "Gửi phê duyệt"
+activate UI
+
+UI -> Engine : Gọi API: POST /api/v1/requests/start
+activate Engine
+
+Engine -> Engine : Validate dữ liệu biểu mẫu (Form Validation)
+alt Dữ liệu hợp lệ
+    Engine -> DB : INSERT bản ghi Request mới (Status: PENDING)
+    activate DB
+    DB --> Engine : Trả về Request_ID
+    deactivate DB
+    Engine --> UI : Trả mã 201 Created + Request_ID
+    UI --> User : Hiển thị màn hình "Gửi đề xuất thành công"
+end
+deactivate Engine
+deactivate UI
+
+== Xét duyệt và Yêu cầu sửa đổi/Chấp thuận ==
+Engine -> UI : Gửi thông báo Push Notification khẩn
+activate UI
+UI -> Manager : Hiển thị đơn chờ phê duyệt
+deactivate UI
+
+Manager -> UI : Chọn Phê duyệt (Approve) HOẶC Bổ sung (Rework)
+activate UI
+UI -> Engine : POST /api/v1/requests/{id}/process {action, comment}
+activate Engine
+
+alt Hành động = YÊU CẦU BỔ SUNG (Rework)
+    Engine -> DB : UPDATE status = REWORK
+    activate DB
+    DB --> Engine : OK
+    deactivate DB
+    Engine -> DB : INSERT nội dung yêu cầu vào Audit_Log
+    activate DB
+    DB --> Engine : OK
+    deactivate DB
+    Engine --> UI : Trả phản hồi 200 OK
+    UI --> Manager : Báo đã chuyển gửi yêu cầu bổ sung
+    UI -> User : Thông báo đơn cần chỉnh sửa
+
+else Hành động = PHÊ DUYỆT (Approve)
+    Engine -> DB : UPDATE status = APPROVED
+    activate DB
+    DB --> Engine : OK
+    deactivate DB
+    Engine -> DB : INSERT mốc lịch sử phê duyệt vào Audit_Log
+    activate DB
+    DB --> Engine : OK
+    deactivate DB
+    Engine -> DB : UPDATE chỉ số KPIs hiệu suất trên Dashboard bảng tổng hợp
+    activate DB
+    DB --> Engine : OK
+    deactivate DB
+    
+    opt Nếu có cấu hình sinh chuỗi phối hợp ngang
+        Engine -> DB : INSERT danh sách Tasks mới vào bảng Kanban phòng ban
+        activate DB
+        DB --> Engine : OK
+        deactivate DB
+    end
+    Engine --> UI : Trả phản hồi 200 OK
+    UI --> Manager : Báo phê duyệt thành công
+    UI -> User : Thông báo đơn đã được thông qua
+end
+
+deactivate Engine
+deactivate UI
+@enduml

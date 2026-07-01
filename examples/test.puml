@@ -1,0 +1,6 @@
+@startuml
+actor ThuNgan
+actor QuanLy
+ThuNgan -> QuanLy : Yeu cau xac nhan
+QuanLy --> ThuNgan : Xac nhan thanh cong
+@enduml

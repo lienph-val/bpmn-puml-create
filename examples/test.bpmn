@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_Customer" name="KHÁCH HÀNG" processRef="Process_Customer" />
+    <bpmn:participant id="Participant_System" name="HỆ THỐNG QUẢN LÝ BÁN HÀNG" processRef="Process_System" />
+    <bpmn:messageFlow id="Flow_Message_1" sourceRef="Task_Customer_Pay" targetRef="Task_Cashier_3" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_Customer" isExecutable="false">
+    <bpmn:userTask id="Task_Customer_Pay" name="Lựa chọn thanh toán tiền mặt" />
+  </bpmn:process>
+
+  <bpmn:process id="Process_System" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Cashier" name="THU NGÂN">
+        <bpmn:flowNodeRef>StartEvent_Cashier</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Cashier_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Cashier_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Cashier_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Cashier</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Manager" name="QUẢN LÝ">
+        <bpmn:flowNodeRef>StartEvent_Manager</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Manager_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Manager</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Storekeeper" name="THỦ KHO">
+        <bpmn:flowNodeRef>StartEvent_Storekeeper</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Storekeeper_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Storekeeper_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Storekeeper_3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Storekeeper</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_Cashier" name="đăng nhập">
+      <bpmn:outgoing>Flow_Cashier_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Cashier_1" name="Nhập mã sản phẩm">
+      <bpmn:incoming>Flow_Cashier_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Cashier_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Cashier_2" name="Nhập thông tin khách hàng">
+      <bpmn:incoming>Flow_Cashier_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Cashier_3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Cashier_3" name="Nhập số tiền thanh toán">
+      <bpmn:incoming>Flow_Cashier_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_Cashier_4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_Cashier" name="kết thúc">
+      <bpmn:incoming>Flow_Cashier_4</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_Cashier_1" sourceRef="StartEvent_Cashier" targetRef="Task_Cashier_1" />
+    <bpmn:sequenceFlow id="Flow_Cashier_2" sourceRef="Task_Cashier_1" targetRef="Task_Cashier_2" />
+    <bpmn:sequenceFlow id="Flow_Cashier_3" sourceRef="Task_Cashier_2" targetRef="Task_Cashier_3" />
+    <bpmn:sequenceFlow id="Flow_Cashier_4" sourceRef="Task_Cashier_3" targetRef="EndEvent_Cashier" />
+
+    <bpmn:startEvent id="StartEvent_Manager" name="đăng nhập">
+      <bpmn:outgoing>Flow_Manager_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Manager_1" name="Điền thông tin sản phẩm">
+      <bpmn:incoming>Flow_Manager_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Manager_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_Manager" name="kết thúc">
+      <bpmn:incoming>Flow_Manager_2</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_Manager_1" sourceRef="StartEvent_Manager" targetRef="Task_Manager_1" />
+    <bpmn:sequenceFlow id="Flow_Manager_2" sourceRef="Task_Manager_1" targetRef="EndEvent_Manager" />
+
+    <bpmn:startEvent id="StartEvent_Storekeeper" name="đăng nhập">
+      <bpmn:outgoing>Flow_Storekeeper_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Storekeeper_1" name="Nhập thông tin nhà cung cấp">
+      <bpmn:incoming>Flow_Storekeeper_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Storekeeper_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Storekeeper_2" name="Nhập thông tin đơn nhập kho">
+      <bpmn:incoming>Flow_Storekeeper_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Storekeeper_3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_Storekeeper_3" name="Nhập thông tin xin xuất kho">
+      <bpmn:incoming>Flow_Storekeeper_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_Storekeeper_4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_Storekeeper" name="kết thúc">
+      <bpmn:incoming>Flow_Storekeeper_4</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_Storekeeper_1" sourceRef="StartEvent_Storekeeper" targetRef="Task_Storekeeper_1" />
+    <bpmn:sequenceFlow id="Flow_Storekeeper_2" sourceRef="Task_Storekeeper_1" targetRef="Task_Storekeeper_2" />
+    <bpmn:sequenceFlow id="Flow_Storekeeper_3" sourceRef="Task_Storekeeper_2" targetRef="Task_Storekeeper_3" />
+    <bpmn:sequenceFlow id="Flow_Storekeeper_4" sourceRef="Task_Storekeeper_3" targetRef="EndEvent_Storekeeper" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      
+      <bpmndi:BPMNShape id="Participant_Customer_di" bpmnElement="Participant_Customer" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="760" height="120" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Customer_Pay_di" bpmnElement="Task_Customer_Pay">
+        <dc:Bounds x="580" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Participant_System_di" bpmnElement="Participant_System" isHorizontal="true">
+        <dc:Bounds x="160" y="230" width="760" height="450" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Lane_Cashier_di" bpmnElement="Lane_Cashier" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="730" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Manager_di" bpmnElement="Lane_Manager" isHorizontal="true">
+        <dc:Bounds x="190" y="380" width="730" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Storekeeper_di" bpmnElement="Lane_Storekeeper" isHorizontal="true">
+        <dc:Bounds x="190" y="530" width="730" height="150" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartEvent_Cashier_di" bpmnElement="StartEvent_Cashier" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
+        <dc:Bounds x="240" y="287" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="232" y="330" width="53" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Cashier_1_di" bpmnElement="Task_Cashier_1">
+        <dc:Bounds x="310" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cashier_2_di" bpmnElement="Task_Cashier_2">
+        <dc:Bounds x="440" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Cashier_3_di" bpmnElement="Task_Cashier_3">
+        <dc:Bounds x="580" y="265" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="EndEvent_Cashier_di" bpmnElement="EndEvent_Cashier" bioc:stroke="#e53935" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#e53935">
+        <dc:Bounds x="740" y="287" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="739" y="330" width="39" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Cashier_1_di" bpmnElement="Flow_Cashier_1">
+        <di:waypoint x="276" y="305" />
+        <di:waypoint x="310" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cashier_2_di" bpmnElement="Flow_Cashier_2">
+        <di:waypoint x="410" y="305" />
+        <di:waypoint x="440" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cashier_3_di" bpmnElement="Flow_Cashier_3">
+        <di:waypoint x="540" y="305" />
+        <di:waypoint x="580" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Cashier_4_di" bpmnElement="Flow_Cashier_4">
+        <di:waypoint x="680" y="305" />
+        <di:waypoint x="740" y="305" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNShape id="StartEvent_Manager_di" bpmnElement="StartEvent_Manager" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
+        <dc:Bounds x="240" y="437" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="232" y="480" width="53" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Manager_1_di" bpmnElement="Task_Manager_1">
+        <dc:Bounds x="380" y="415" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="EndEvent_Manager_di" bpmnElement="EndEvent_Manager" bioc:stroke="#e53935" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#e53935">
+        <dc:Bounds x="540" y="437" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="539" y="480" width="39" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Manager_1_di" bpmnElement="Flow_Manager_1">
+        <di:waypoint x="276" y="455" />
+        <di:waypoint x="380" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Manager_2_di" bpmnElement="Flow_Manager_2">
+        <di:waypoint x="480" y="455" />
+        <di:waypoint x="540" y="455" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNShape id="StartEvent_Storekeeper_di" bpmnElement="StartEvent_Storekeeper" bioc:stroke="#43a047" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#43a047">
+        <dc:Bounds x="240" y="587" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="232" y="630" width="53" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Storekeeper_1_di" bpmnElement="Task_Storekeeper_1">
+        <dc:Bounds x="310" y="565" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Storekeeper_2_di" bpmnElement="Task_Storekeeper_2">
+        <dc:Bounds x="440" y="565" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Storekeeper_3_di" bpmnElement="Task_Storekeeper_3">
+        <dc:Bounds x="580" y="565" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="EndEvent_Storekeeper_di" bpmnElement="EndEvent_Storekeeper" bioc:stroke="#e53935" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#e53935">
+        <dc:Bounds x="740" y="587" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="739" y="630" width="39" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Storekeeper_1_di" bpmnElement="Flow_Storekeeper_1">
+        <di:waypoint x="276" y="605" />
+        <di:waypoint x="310" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Storekeeper_2_di" bpmnElement="Flow_Storekeeper_2">
+        <di:waypoint x="410" y="605" />
+        <di:waypoint x="440" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Storekeeper_3_di" bpmnElement="Flow_Storekeeper_3">
+        <di:waypoint x="540" y="605" />
+        <di:waypoint x="580" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Storekeeper_4_di" bpmnElement="Flow_Storekeeper_4">
+        <di:waypoint x="680" y="605" />
+        <di:waypoint x="740" y="605" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_Message_1_di" bpmnElement="Flow_Message_1">
+        <di:waypoint x="630" y="180" />
+        <di:waypoint x="630" y="265" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

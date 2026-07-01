@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Kế toán / C&B" as CB
+
+rectangle "Hệ thống Chấm công" {
+    usecase "UC02: Tổng hợp Bảng công" as UC02
+    usecase "Truy xuất Log chấm công" as GetLogs
+    usecase "Truy xuất Đơn từ vắng mặt" as GetLeaves
+    usecase "Chốt khóa dữ liệu (Freeze)" as Freeze
+}
+
+CB --> UC02
+UC02 ..> GetLogs : <<include>>
+UC02 ..> GetLeaves : <<include>>
+Freeze ..> UC02 : <<extend>>
+@enduml

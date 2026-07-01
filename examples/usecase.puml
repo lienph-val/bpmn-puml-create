@@ -1,0 +1,37 @@
+@startuml
+' Cấu hình giao diện hiện đại, sạch sẽ giống Draw.io
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam packageStyle rectangle
+
+left to right direction
+
+actor "Người dùng\ncó tài khoản" as User
+actor "Thủ kho" as ThuKho
+actor "Quản lý" as QuanLy
+actor "Thu ngân" as ThuNgan
+
+' Thể hiện mối quan hệ kế thừa (mũi tên rỗng chuẩn UML)
+ThuKho --|> User
+QuanLy --|> User
+ThuNgan --|> User
+
+rectangle "Hệ Thống Quản Lý" {
+    usecase "Quản Lý Kho" as UC_Kho
+    usecase "Quản Lý Báo Cáo" as UC_BaoCao
+    usecase "Quản Lý Sản Phẩm" as UC_SanPham
+    usecase "Quản Lý Khách Hàng" as UC_KhachHang
+    usecase "Quản Lý Thanh Toán" as UC_ThanhToan
+    usecase "Quản Lý Xác Thực" as UC_XacThuc
+}
+
+' Kết nối Actor với Use Case chuẩn xác theo ảnh của bạn
+ThuKho --> UC_Kho
+QuanLy --> UC_BaoCao
+QuanLy --> UC_SanPham
+QuanLy --> UC_KhachHang
+ThuNgan --> UC_ThanhToan
+User --> UC_XacThuc
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Tenant Admin" as TAdmin
+
+rectangle "Hệ thống IAM" {
+    usecase "UC05: Gán phân quyền" as UC05
+    usecase "Kiểm tra xung đột quyền lợi" as CheckConflict
+    usecase "UC07: Ghi vết Audit Log" as UC07
+}
+
+TAdmin --> UC05
+UC05 ..> CheckConflict : <<include>>
+UC05 ..> UC07 : <<include>>
+@enduml

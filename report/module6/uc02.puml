@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Nhân viên" as User
+
+rectangle "Kho Tri Thức & Giao Tiếp" {
+    usecase "UC02: Tra cứu và Thảo luận" as UC02
+    usecase "Truy vấn Elasticsearch" as Search
+    usecase "Lưu nội dung Comment" as Comment
+    usecase "Gửi Noti (Tag/Mention)" as Mention
+}
+
+User --> UC02
+UC02 ..> Search : <<include>>
+UC02 ..> Comment : <<include>>
+Comment ..> Mention : <<extend>>
+@enduml

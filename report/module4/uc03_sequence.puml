@@ -1,0 +1,50 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Payroll Admin" as Admin
+participant "Giao diện (Web)" as UI
+participant "Payroll Engine" as Engine
+participant "HRM Service" as HRM
+database "Database\n(Tenant DB)" as DB
+
+Admin -> UI : Nhấn "Chạy bảng lương"
+activate UI
+
+UI -> Engine : POST /api/v1/payroll/calculate
+activate Engine
+
+Engine -> DB : SELECT Dữ liệu Bảng công chốt (Frozen Timesheet)
+activate DB
+DB --> Engine : Return Working_Hours Data
+deactivate DB
+
+Engine -> HRM : API Call: Lấy danh sách Lương Hợp đồng đang Active
+activate HRM
+HRM --> Engine : Return Salary Base, Allowances, Dependents
+deactivate HRM
+
+Engine -> Engine : Thực thi Script Công thức lương (Formula Execution)
+Engine -> Engine : Tính Thuế lũy tiến & Các khoản giảm trừ
+
+Engine -> DB : INSERT Bảng lương tổng hợp (Payroll_Records)
+activate DB
+DB --> Engine : OK
+deactivate DB
+
+Engine --> UI : Trả về dữ liệu Grid Bảng lương
+UI --> Admin : Hiển thị bảng lương chi tiết
+
+Admin -> UI : Nhấn "Phát hành Payslip"
+UI -> Engine : POST /api/v1/payroll/publish-payslip
+
+Engine -> Engine : Mã hóa dữ liệu (Password protection = CCCD)
+Engine -> DB : Kích hoạt Queue gửi Email hàng loạt
+Engine --> UI : 200 OK
+UI --> Admin : Thông báo "Payslip đang được gửi ngầm"
+
+deactivate Engine
+deactivate UI
+@enduml

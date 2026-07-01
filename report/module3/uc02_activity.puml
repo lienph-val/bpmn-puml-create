@@ -1,0 +1,37 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|HR Admin|
+start
+:Truy cập thẻ \nHồ sơ Hợp đồng nhân viên;
+:Chọn "Thêm mới Hợp đồng";
+:Nhập thông tin \n (Ngày bắt đầu, \n Ngày kết thúc, Lương);
+:Nhấn "Lưu cấu hình";
+
+|Hệ thống HRM|
+if (Ngày kết thúc \n > Ngày bắt đầu?) then (Không)
+    :Sinh cảnh báo \n lỗi mốc thời gian;
+    |HR Admin|
+    :Hiển thị lỗi \n "Logic ngày tháng không hợp lệ";
+else (Có)
+    |Hệ thống HRM|
+    :Lưu bản ghi Hợp đồng \n vào Cơ sở dữ liệu;
+    :Cập nhật các mốc thời gian \n vào Job Cảnh báo tự động;
+    |HR Admin|
+    if (Có nhu cầu \n in hợp đồng?) then (Có)
+        :Nhấn nút \n "Xuất PDF/Word";
+        |Hệ thống HRM|
+        :Ánh xạ dữ liệu \n vào Template mẫu;
+        :Tạo file và \n tải xuống máy khách;
+        |HR Admin|
+    else (Không)
+    endif
+    :Hiển thị thông báo \n "Cập nhật hợp đồng thành công";
+endif
+
+stop
+@enduml

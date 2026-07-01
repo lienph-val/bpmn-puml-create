@@ -1,0 +1,32 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên Văn thư|
+start
+:Nhập thông tin Trích yếu \nvà Nơi nhận công văn;
+:Tải tệp tin (File PDF) \nđính kèm lên hệ thống;
+:Nhấn nút "Ban hành";
+
+|Hệ thống E-Office|
+:Kiểm tra định dạng File \nvà Dung lượng tải lên;
+
+if (Tệp đính kèm \nhợp lệ không?) then (Không)
+    :Sinh cảnh báo lỗi \ndung lượng/định dạng;
+    |Nhân viên Văn thư|
+    :Hiển thị lỗi "Upload thất bại";
+else (Có)
+    |Hệ thống E-Office|
+    :Tự động sinh Số hiệu \ncông văn theo quy tắc;
+    :Lưu trữ File vào \nObject Storage nội bộ;
+    :Lưu bản ghi dữ liệu \nvào Cơ sở dữ liệu;
+    :Kích hoạt tiến trình \ngửi Thông báo (Noti);
+    |Nhân viên Văn thư|
+    :Hiển thị trạng thái \n"Ban hành thành công";
+endif
+
+stop
+@enduml

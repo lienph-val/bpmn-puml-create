@@ -1,0 +1,23 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Kế toán / C&B" as CB
+
+rectangle "Hệ thống Payroll" {
+    usecase "UC03: Tính lương và Xuất Payslip" as UC03
+    usecase "Lấy dữ liệu Bảng công" as GetTime
+    usecase "Đọc cấu hình Hợp đồng" as GetSalary
+    usecase "Thực thi công thức No-code" as RunFormula
+    usecase "Gửi Email Payslip bảo mật" as SendPayslip
+}
+
+CB --> UC03
+UC03 ..> GetTime : <<include>>
+UC03 ..> GetSalary : <<include>>
+UC03 ..> RunFormula : <<include>>
+SendPayslip ..> UC03 : <<extend>>
+@enduml

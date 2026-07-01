@@ -1,0 +1,29 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên khởi tạo|
+start
+:Chọn loại đề xuất cần tạo;
+:Điền thông tin và đính kèm chứng từ;
+:Nhấn nút "Gửi phê duyệt";
+
+|Hệ thống Quản lý Quy trình BPM|
+if (Dữ liệu biểu mẫu điền đầy đủ?) then (Không)
+    |Nhân viên khởi tạo|
+    :Hiển thị thông báo nhập thiếu thông tin (*);
+    :Yêu cầu bổ sung dữ liệu;
+else (Có)
+    |Hệ thống Quản lý Quy trình BPM|
+    :Khởi tạo một thực thể quy trình mới;
+    :Ghi log hành động gửi đề xuất vào CSDL;
+    :Tính toán định tuyến cấp duyệt đầu tiên;
+    :Gửi cảnh báo Notification/Email xử lý;
+    |Nhân viên khởi tạo|
+    :Hiển thị trạng thái đề xuất "Đang chờ duyệt";
+endif
+stop
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "C&B Admin" as CB
+participant "Giao diện (Web)" as UI
+participant "Timesheet Engine" as Engine
+participant "Workflow Service" as Workflow
+database "Database\n(Tenant DB)" as DB
+
+CB -> UI : Nhấn "Tổng hợp Bảng công"
+activate UI
+
+UI -> Engine : POST /api/v1/timesheet/aggregate {month}
+activate Engine
+
+Engine -> DB : Lấy toàn bộ Raw Logs tháng
+activate DB
+DB --> Engine : Logs Data
+deactivate DB
+
+Engine -> Workflow : API Call: Lấy Đơn từ vắng mặt (Leaves)
+activate Workflow
+Workflow --> Engine : Danh sách Đơn đã duyệt (Approved)
+deactivate Workflow
+
+Engine -> Engine : Engine Logic: Khớp Log với Ca làm
+Engine -> Engine : Engine Logic: Điền lấp ngày nghỉ bằng Leave Data
+
+Engine -> DB : LƯU Cập nhật Bảng Timesheet_Data
+activate DB
+DB --> Engine : OK
+deactivate DB
+
+Engine --> UI : Trả về dữ liệu Grid hoàn chỉnh
+UI --> CB : Hiển thị Bảng công tháng lên màn hình
+
+CB -> UI : Bấm "Chốt bảng công (Freeze)"
+UI -> Engine : POST /api/v1/timesheet/freeze
+Engine -> DB : UPDATE status = 'FROZEN'
+Engine --> UI : OK
+UI --> CB : Khóa màn hình, chỉ cho phép đọc (Read-only)
+
+deactivate Engine
+deactivate UI
+@enduml

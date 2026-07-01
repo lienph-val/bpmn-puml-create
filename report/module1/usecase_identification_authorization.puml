@@ -1,0 +1,41 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam linetype line
+skinparam DefaultFontName Arial
+
+left to right direction
+
+' Định nghĩa và cố định trục dọc cho các Actor bên trái
+actor "System Admin" as SAdmin
+actor "Người dùng" as User
+actor "Tenant Admin" as TAdmin
+
+User <|-- TAdmin
+SAdmin -[hidden]down-> User
+User -[hidden]down-> TAdmin
+
+' Sắp xếp lại thứ tự xuất hiện của Use Case tương ứng theo vị trí Actor để đường đi thẳng hàng
+rectangle "Module Quản Trị Định Danh & Phân Quyền (IAM)" {
+    usecase "UC06: Cấp phát Tenant" as UC06
+    usecase "UC01: Đăng nhập" as UC01
+    usecase "UC02: Đăng xuất" as UC02
+    usecase "UC03: Quên mật khẩu" as UC03
+    usecase "UC04: Quản lý người dùng" as UC04
+    usecase "UC05: Gán phân quyền" as UC05
+    usecase "UC07: Theo dõi Audit Log" as UC07
+}
+
+' Các đường nối từ trên xuống dưới đi theo đường chim bay thẳng tắp
+SAdmin --> UC06
+SAdmin --> UC01
+
+User --> UC01
+User --> UC02
+User --> UC03
+
+TAdmin --> UC04
+TAdmin --> UC05
+TAdmin --> UC07
+@enduml

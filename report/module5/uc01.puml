@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Kế toán viên" as Acc
+
+rectangle "Hệ thống Tài chính" {
+    usecase "UC01: Quản lý Tạm ứng và Chi tiền" as UC01
+    usecase "Kiểm tra Đề xuất được duyệt" as CheckReq
+    usecase "Sinh bút toán Công nợ" as GenLedger
+    usecase "Từ chối giải ngân" as Reject
+}
+
+Acc --> UC01
+UC01 ..> CheckReq : <<include>>
+UC01 ..> GenLedger : <<include>>
+Reject ..> UC01 : <<extend>>
+@enduml

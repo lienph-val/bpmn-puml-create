@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Architect Diagram Viewer</title>
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js/dist/assets/diagram-js.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js/dist/assets/bpmn-js.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bpmn-js/dist/assets/bpmn-font/css/bpmn.css" />
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background: #f4f4f9; }
+      .toolbar { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+      button { padding: 8px 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+      button:hover { background: #0056b3; }
+      .canvas-wrapper {
+        width: 100%;
+        height: 70vh;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #ccc;
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <select id="diagramType">
+        <option value="bpmn">BPMN (XML)</option>
+        <option value="uml">UML (PlantUML txt/xml)</option>
+      </select>
+      <input type="file" id="fileInput" accept=".xml,.bpmn,.txt,.puml" />
+      <button id="btnSvg">Download SVG</button>
+      <button id="btnPng">Download PNG</button>
+      <button id="btnDrawio">Download Draw.io</button>
+    </div>
+
+    <!-- 2 canvas riêng biệt, tránh xung đột DOM -->
+    <div id="canvas-bpmn" class="canvas-wrapper"></div>
+    <div id="canvas-uml"  class="canvas-wrapper" style="display:none;"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

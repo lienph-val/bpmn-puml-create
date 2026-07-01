@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Nhân viên" as User
+
+rectangle "Hệ thống Chấm công" {
+    usecase "UC01: Chấm công hàng ngày" as UC01
+    usecase "Xác thực thiết bị/Tài khoản" as Auth
+    usecase "Kiểm tra tọa độ GPS / IP Wifi" as CheckGPS
+    usecase "Gửi yêu cầu giải trình giờ công" as RequestExp
+}
+
+User --> UC01
+UC01 ..> Auth : <<include>>
+UC01 ..> CheckGPS : <<include>>
+RequestExp ..> UC01 : <<extend>>
+@enduml

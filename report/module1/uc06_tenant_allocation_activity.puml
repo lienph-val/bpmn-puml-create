@@ -1,0 +1,29 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|System Admin|
+start
+:Chọn chức năng "Thêm Doanh nghiệp mới";
+:Nhập thông tin Doanh nghiệp (Tên cty, Subdomain...);
+:Nhấn "Khởi tạo";
+
+|Hệ thống IAM|
+if (Tên miền phụ (Domain) đã tồn tại?) then (Có)
+    :Sinh thông báo lỗi domain trùng;
+    |System Admin|
+    :Hiển thị thông báo "Subdomain đã tồn tại";
+else (Không)
+    |Hệ thống IAM|
+    :Tạo Schema DB riêng biệt (Tenant Schema);
+    :Khởi tạo Tài khoản Admin Doanh nghiệp;
+    :Gửi Email thông báo URL đăng nhập;
+    |System Admin|
+    :Hiển thị thông báo "Cấp phát Tenant thành công";
+endif
+
+stop
+@enduml

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Payroll" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_Payroll">
+    <bpmn:participant id="Participant_Emp" name="Nhân viên" processRef="Process_Emp" />
+    <bpmn:participant id="Participant_System" name="Hệ thống Chấm công &#38; Tính lương" processRef="Process_System" />
+    <bpmn:participant id="Participant_CB" name="Chuyên viên C&#38;B" processRef="Process_CB" />
+    <bpmn:messageFlow id="Flow_M1" sourceRef="Task_EmpCheckin" targetRef="Task_RecordLog" />
+    <bpmn:messageFlow id="Flow_M2" sourceRef="Task_TriggerTimesheet" targetRef="Task_CalcTimesheet" />
+    <bpmn:messageFlow id="Flow_M3" sourceRef="Task_TriggerPayroll" targetRef="Task_RunFormula" />
+    <bpmn:messageFlow id="Flow_M4" sourceRef="Task_SendPayslip" targetRef="Task_ViewPayslip" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Emp" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_Daily" name="Đến giờ làm">
+      <bpmn:outgoing>Flow_E1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_EmpCheckin" name="Thực hiện Check-in/out">
+      <bpmn:incoming>Flow_E1</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Task_ViewPayslip" name="Nhận và xem Phiếu lương">
+      <bpmn:outgoing>Flow_E2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_Emp" name="Hoàn tất">
+      <bpmn:incoming>Flow_E2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_E1" sourceRef="StartEvent_Daily" targetRef="Task_EmpCheckin" />
+    <bpmn:sequenceFlow id="Flow_E2" sourceRef="Task_ViewPayslip" targetRef="EndEvent_Emp" />
+  </bpmn:process>
+  <bpmn:process id="Process_System" isExecutable="false">
+    <bpmn:task id="Task_RecordLog" name="Ghi nhận Log thô (Raw Data)" />
+    <bpmn:task id="Task_CalcTimesheet" name="Đối chiếu Ca làm &#38; Đơn từ xin nghỉ">
+      <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_GenTimesheet" name="Xuất Bảng công chuẩn">
+      <bpmn:incoming>Flow_S1</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:task id="Task_RunFormula" name="Chạy công thức lương (Thuế, BHXH, Phụ cấp)">
+      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SendPayslip" name="Phát hành Payslip điện tử bảo mật">
+      <bpmn:incoming>Flow_S2</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_S1" sourceRef="Task_CalcTimesheet" targetRef="Task_GenTimesheet" />
+    <bpmn:sequenceFlow id="Flow_S2" sourceRef="Task_RunFormula" targetRef="Task_SendPayslip" />
+  </bpmn:process>
+  <bpmn:process id="Process_CB" isExecutable="false">
+    <bpmn:task id="Task_TriggerTimesheet" name="Chốt bảng công cuối tháng" />
+    <bpmn:task id="Task_TriggerPayroll" name="Chạy bảng lương tháng" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_Payroll">
+      <bpmndi:BPMNShape id="Participant_Emp_di" bpmnElement="Participant_Emp" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="880" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_System_di" bpmnElement="Participant_System" isHorizontal="true">
+        <dc:Bounds x="120" y="250" width="880" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_CB_di" bpmnElement="Participant_CB" isHorizontal="true">
+        <dc:Bounds x="120" y="470" width="880" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Daily_di" bpmnElement="StartEvent_Daily">
+        <dc:Bounds x="180" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EmpCheckin_di" bpmnElement="Task_EmpCheckin">
+        <dc:Bounds x="260" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ViewPayslip_di" bpmnElement="Task_ViewPayslip">
+        <dc:Bounds x="820" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Emp_di" bpmnElement="EndEvent_Emp">
+        <dc:Bounds x="950" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_E1_di" bpmnElement="Flow_E1">
+        <di:waypoint x="216" y="150" />
+        <di:waypoint x="260" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_E2_di" bpmnElement="Flow_E2">
+        <di:waypoint x="920" y="150" />
+        <di:waypoint x="950" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_RecordLog_di" bpmnElement="Task_RecordLog">
+        <dc:Bounds x="260" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CalcTimesheet_di" bpmnElement="Task_CalcTimesheet">
+        <dc:Bounds x="420" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GenTimesheet_di" bpmnElement="Task_GenTimesheet">
+        <dc:Bounds x="560" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RunFormula_di" bpmnElement="Task_RunFormula">
+        <dc:Bounds x="690" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendPayslip_di" bpmnElement="Task_SendPayslip">
+        <dc:Bounds x="820" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_S1_di" bpmnElement="Flow_S1">
+        <di:waypoint x="520" y="340" />
+        <di:waypoint x="560" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S2_di" bpmnElement="Flow_S2">
+        <di:waypoint x="790" y="340" />
+        <di:waypoint x="820" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_TriggerTimesheet_di" bpmnElement="Task_TriggerTimesheet">
+        <dc:Bounds x="420" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TriggerPayroll_di" bpmnElement="Task_TriggerPayroll">
+        <dc:Bounds x="690" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_M1_di" bpmnElement="Flow_M1">
+        <di:waypoint x="310" y="190" />
+        <di:waypoint x="310" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_M2_di" bpmnElement="Flow_M2">
+        <di:waypoint x="470" y="500" />
+        <di:waypoint x="470" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_M3_di" bpmnElement="Flow_M3">
+        <di:waypoint x="740" y="500" />
+        <di:waypoint x="740" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_M4_di" bpmnElement="Flow_M4">
+        <di:waypoint x="870" y="300" />
+        <di:waypoint x="870" y="190" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

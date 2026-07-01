@@ -1,0 +1,35 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Kế toán tiền lương|
+start
+:Tạo kỳ lương tháng và \nnhấn "Chạy tính toán";
+
+|Payroll Engine|
+:Truy xuất dữ liệu \nCông chuẩn (Timesheet);
+:Lấy Mức lương cơ bản \ntừ Hợp đồng (HRM);
+
+if (Công thức thiết lập \nhợp lệ?) then (Không)
+    :Sinh cảnh báo lỗi \ncú pháp công thức;
+    |Kế toán tiền lương|
+    :Sửa lại cấu hình \nNo-code Formula;
+else (Có)
+    |Payroll Engine|
+    :Tính toán Lương gộp, \nThuế TNCN, BHXH;
+    :Xuất kết quả Lương Net \nlên Bảng tổng hợp;
+    |Kế toán tiền lương|
+    :Duyệt Bảng lương và \nnhấn "Phát hành Payslip";
+    |Payroll Engine|
+    :Tách dữ liệu thành \ntừng phiếu lương cá nhân;
+    :Mã hóa file PDF bằng \nMật khẩu (CCCD/Ngày sinh);
+    :Gửi Email Payslip \nđến từng nhân viên;
+    |Kế toán tiền lương|
+    :Hiển thị trạng thái \n"Đã phát hành thành công";
+endif
+
+stop
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+' Ép chiều rộng tối đa của các ô hành động (tự động ngắt dòng nếu vượt quá)
+skinparam wrapWidth 150
+
+|Người dùng|
+start
+:Truy cập trang đăng nhập;
+:Nhập Email và Password;
+
+|Hệ thống IAM|
+' Dùng \n để chủ động ngắt dòng các câu điều kiện quá dài
+if (Tenant có đang bị\nkhóa không?) then (Có)
+    |Người dùng|
+    :Hiển thị lỗi\n"Doanh nghiệp đã hết hạn dịch vụ";
+else (Không)
+    |Hệ thống IAM|
+    if (Thông tin Email/Mật khẩu\ncó khớp CSDL?) then (Có)
+        if (Tài khoản đang bị khóa\ndo nhập sai?) then (Có)
+            |Người dùng|
+            :Hiển thị lỗi\n"Tài khoản đang bị khóa 15 phút";
+        else (Không)
+            |Hệ thống IAM|
+            :Ghi log thời gian & IP\nđăng nhập (Audit Log);
+            :Khởi tạo phiên làm việc\ncho người dùng;
+            |Người dùng|
+            :Chuyển hướng vào Dashboard;
+        endif
+    else (Không)
+        |Hệ thống IAM|
+        :Tăng biến đếm số lần\nnhập sai +1;
+        if (Số lần nhập sai >= 5?) then (Có)
+            :Khóa tài khoản\ntạm thời 15 phút;
+            |Người dùng|
+            :Hiển thị lỗi\n"Tài khoản bị khóa do\nnhập sai quá số lần";
+        else (Không)
+            |Người dùng|
+            :Hiển thị lỗi\n"Sai thông tin đăng nhập";
+        endif
+    endif
+endif
+
+stop
+@enduml

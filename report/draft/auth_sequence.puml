@@ -1,0 +1,57 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+autonumber
+
+actor "Client\n(Trình duyệt)" as Client
+participant "API Gateway" as AG
+participant "IAM Service" as IAM
+database "Database" as DB
+
+== Giai đoạn 1: Xác thực (Authentication) ==
+
+Client -> AG: POST /api/login\n(Username, Password)
+activate AG
+AG -> IAM: Forward Request
+activate IAM
+IAM -> DB: Truy vấn User theo Username
+activate DB
+DB --> IAM: Trả về Password Hash & Status
+deactivate DB
+
+IAM -> IAM: So sánh Hash (Bcrypt/Argon2 thuật toán)
+
+alt Sai thông tin hoặc Tài khoản bị khóa
+    IAM --> AG: 401 Unauthorized
+    AG --> Client: Hiển thị lỗi đăng nhập
+else Thông tin hợp lệ
+    IAM -> IAM: Khởi tạo JWT Token\n(Payload: User_ID, Tenant_ID, Role)
+    IAM -> DB: Lưu Session đăng nhập
+    activate DB
+    DB --> IAM: Xác nhận
+    deactivate DB
+    IAM --> AG: Trả về Access Token & Refresh Token
+    AG --> Client: 200 OK + Lưu Token vào LocalStorage/Cookie
+end
+deactivate IAM
+deactivate AG
+
+== Giai đoạn 2: Phân quyền dữ liệu (Data Permission) ==
+
+Client -> AG: GET /api/employees\n(Header: Authorization Bearer [Token])
+activate AG
+AG -> AG: Xác thực chữ ký Token & Thời hạn
+AG -> IAM: Giải mã JWT lấy Tenant_ID & Role
+activate IAM
+IAM -> DB: Query: SELECT * FROM Employee\nWHERE Tenant_ID = X
+activate DB
+DB --> IAM: Trả về tập dữ liệu đã được lọc chặt chẽ
+deactivate DB
+IAM --> AG: Xử lý logic hiển thị
+deactivate IAM
+AG --> Client: 200 OK + Dữ liệu dạng JSON
+deactivate AG
+
+@enduml

@@ -1,0 +1,43 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Nhân viên" as Emp
+participant "Giao diện (Web)" as UI
+participant "Finance Service" as FinEngine
+participant "OCR AI Service" as OCR
+database "Database" as DB
+
+Emp -> UI : Tải ảnh Hóa đơn lên
+activate UI
+
+UI -> FinEngine : POST /api/v1/ocr/extract (Image File)
+activate FinEngine
+
+FinEngine -> OCR : gRPC Call: Analyze Invoice
+activate OCR
+OCR -> OCR : Xử lý bóc tách (Pattern Matching / AI Model)
+OCR --> FinEngine : Trả về JSON {TaxCode, Date, Amount, ConfidenceScore}
+deactivate OCR
+
+alt Confidence Score < 80% (Ảnh mờ)
+    FinEngine --> UI : 206 Partial Content (Báo lỗi nhận diện)
+    UI --> Emp : Cảnh báo và yêu cầu nhập tay
+else Nhận diện tốt
+    FinEngine --> UI : 200 OK + Dữ liệu JSON
+    UI -> UI : Tự động Fill Data vào Form
+    UI --> Emp : Hiển thị Form đã điền sẵn
+end
+
+Emp -> UI : Bấm "Gửi duyệt Hoàn ứng"
+UI -> FinEngine : POST /api/v1/expenses/submit
+FinEngine -> DB : LƯU bản ghi Expense_Request
+DB --> FinEngine : OK
+FinEngine --> UI : Thành công
+UI --> Emp : Chuyển màn hình
+
+deactivate FinEngine
+deactivate UI
+@enduml

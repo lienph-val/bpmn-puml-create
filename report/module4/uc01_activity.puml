@@ -1,0 +1,28 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên|
+start
+:Mở ứng dụng & Cấp quyền \nđịnh vị (GPS);
+:Nhấn nút "Chấm công";
+
+|Hệ thống Chấm công|
+:Nhận luồng dữ liệu \nTọa độ GPS / IP mạng;
+if (Vị trí nằm trong \nbán kính cho phép?) then (Không)
+    :Sinh cảnh báo lỗi \nvượt vùng;
+    |Nhân viên|
+    :Hiển thị lỗi "Không nằm \ntrong vùng chấm công";
+else (Có)
+    |Hệ thống Chấm công|
+    :Ghi nhận Log thời gian \nvào Database;
+    :Đối chiếu ca làm việc \nđể tính đi trễ/về sớm;
+    |Nhân viên|
+    :Hiển thị thông báo \n"Chấm công thành công";
+endif
+
+stop
+@enduml

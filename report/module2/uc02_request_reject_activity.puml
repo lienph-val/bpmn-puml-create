@@ -1,0 +1,33 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên khởi tạo|
+start
+:Gửi đề xuất thành công \n (Trạng thái Pending);
+
+|Người duyệt (Manager)|
+:Nhận thông báo \n đơn cần xử lý;
+:Mở xem chi tiết \n biểu mẫu động;
+if (Quyết định \n xử lý \n đề xuất?) then (Từ chối (Reject))
+    :Nhập nội dung lý do \n từ chối bắt buộc;
+    :Nhấn xác nhận \n "Từ chối (Reject)";
+    
+    |Hệ thống Quản lý Quy trình BPM|
+    :Cập nhật trạng thái \n đơn thành Rejected;
+    :Khóa vĩnh viễn thực thể \n quy trình hiện tại;
+    :Ghi log lý do từ chối \n vào bảng Audit Log;
+    :Đồng bộ chỉ số đơn \n thất bại lên \n hệ thống Dashboard;
+    
+    |Nhân viên khởi tạo|
+    :Hiển thị thông báo đơn \n đã bị từ chối \n  kèm lý do;
+else (Thao tác khác)
+    |Người duyệt (Manager)|
+    :Chuyển sang luồng \n xử lý tương ứng;
+endif
+
+stop
+@enduml

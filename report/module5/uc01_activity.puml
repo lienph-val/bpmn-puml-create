@@ -1,0 +1,29 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Kế toán viên|
+start
+:Truy cập Danh sách \nĐề nghị tạm ứng chờ chi;
+:Kiểm tra thông tin \nvà số TK nhận tiền;
+
+if (Thông tin hợp lệ \nvà Quỹ đủ tiền?) then (Không)
+    :Nhập lý do và nhấn \n"Từ chối giải ngân";
+    |Hệ thống Tài chính|
+    :Trả đơn về trạng thái \nRework cho nhân viên;
+else (Có)
+    |Kế toán viên|
+    :Thực hiện chuyển tiền \nthực tế (E-Banking);
+    :Nhấn "Xác nhận Đã chi";
+    |Hệ thống Tài chính|
+    :Cập nhật trạng thái \nĐơn = Đã chi tiền;
+    :Tự động sinh bút toán \nCông nợ nhân viên;
+    :Ghi nhận dữ liệu vào \nSổ cái nội bộ (Ledger);
+    :Gửi Noti thông báo \nđã xuất tiền cho Nhân viên;
+endif
+
+stop
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Quản trị viên Nhân sự\n(HR Admin)" as HR
+
+rectangle "Hệ thống HRM" {
+    usecase "UC01: Tuyển dụng và Onboarding" as UC01
+    usecase "Kiểm tra trùng lặp dữ liệu" as Validate
+    usecase "Tạo hồ sơ nhân viên gốc" as CreateProfile
+    usecase "Gọi module IAM sinh tài khoản" as SyncIAM
+}
+
+HR --> UC01
+UC01 ..> Validate : <<include>>
+UC01 ..> CreateProfile : <<include>>
+CreateProfile ..> SyncIAM : <<include>>
+@enduml

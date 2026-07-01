@@ -1,0 +1,45 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam swimlaneBorderColor black
+
+|Nhân viên|
+start
+:Tạo và Gửi đề xuất;
+
+|Hệ thống BPM|
+if (Dữ liệu hợp lệ?) then (Không)
+    |Nhân viên|
+    :Nhận cảnh báo bổ sung\nhoặc sửa thông tin;
+    stop
+else (Có)
+    |Hệ thống BPM|
+    :Ghi nhận hồ sơ &\nGửi thông báo duyệt;
+    
+    |Người duyệt|
+    :Xem xét chi tiết đề xuất;
+    
+    if (Kết quả xử lý?) then (Yêu cầu làm lại)
+        |Hệ thống BPM|
+        :Chuyển trạng thái\n"Cần bổ sung (Rework)";
+        |Nhân viên|
+        :Bổ sung & Gửi lại đơn;
+        
+    else if (Kết quả xử lý?) then (Từ chối)
+        |Hệ thống BPM|
+        :Đóng quy trình (Rejected);
+        |Nhân viên|
+        :Nhận thông báo "Từ chối";
+        
+    else (Phê duyệt)
+        |Hệ thống BPM|
+        :Cập nhật "Đã duyệt" &\nSinh đầu việc Kanban (nếu có);
+        |Nhân viên|
+        :Quy trình hoàn tất;
+    endif
+endif
+
+stop
+@enduml

@@ -1,0 +1,21 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Nhân viên" as User
+
+rectangle "Hệ thống Quản lý Quy trình (BPM)" {
+    usecase "UC02: Khởi tạo và gửi đề xuất" as UC02
+    usecase "Kiểm tra tính hợp lệ biểu mẫu" as Validate
+    usecase "Định tuyến cấp duyệt" as Route
+    usecase "Lưu nháp đề xuất" as SaveDraft
+}
+
+User --> UC02
+UC02 ..> Validate : <<include>>
+UC02 ..> Route : <<include>>
+SaveDraft ..> UC02 : <<extend>>
+@enduml

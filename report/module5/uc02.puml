@@ -1,0 +1,19 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+left to right direction
+actor "Nhân viên" as User
+
+rectangle "Hệ thống Tài chính" {
+    usecase "UC02: Hoàn ứng/Thanh toán" as UC02
+    usecase "AI bóc tách ảnh Hóa đơn (OCR)" as OCR
+    usecase "Đối soát với số tiền Tạm ứng" as Reconcile
+}
+
+User --> UC02
+UC02 ..> OCR : <<include>>
+UC02 ..> Reconcile : <<include>>
+@enduml

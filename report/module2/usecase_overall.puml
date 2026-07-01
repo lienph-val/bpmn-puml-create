@@ -1,0 +1,41 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+left to right direction
+
+' Tăng khoảng cách chiều ngang để mũi tên dài ra, không bị gập gắt
+skinparam ranksep 150 
+skinparam nodesep 50   
+
+' --- TRICK 1: ĐƯA TADMIN LÊN ĐẦU ---
+' Giúp mũi tên trỏ vào UC01 đi ngang, không bị chém ngược lên trên
+actor "Tenant Admin" as TAdmin
+actor "Nhân viên" as User
+actor "Quản lý" as Manager
+actor "Ban điều hành" as CLevel
+
+User <|-- Manager
+Manager <|-- CLevel
+
+' --- TRICK 2: THÊM DẤU XUỐNG DÒNG (\n\n) ---
+' Ép các UC bên trong lùi xuống, bảo vệ vùng chữ tiêu đề
+rectangle "Module Quản Lý Quy Trình & Phê Duyệt Đề Xuất\n\n" {
+    usecase "UC01: Thiết kế cấu hình quy trình" as UC01
+    usecase "UC02: Khởi tạo và gửi đề xuất" as UC02
+    usecase "UC03: Xử lý đầu việc phối hợp" as UC03
+    usecase "UC04: Xem Dashboard thống kê hiệu suất" as UC04
+    usecase "UC05: Cấu hình biểu mẫu động" as UC05
+}
+
+TAdmin --> UC01
+TAdmin --> UC05
+
+User --> UC02
+User --> UC03
+User --> UC04
+
+Manager --> UC04
+CLevel --> UC04
+@enduml

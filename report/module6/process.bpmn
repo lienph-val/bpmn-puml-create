@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_EOffice" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_EOffice">
+    <bpmn:participant id="Participant_VT" name="Văn thư" processRef="Process_VT" />
+    <bpmn:participant id="Participant_System" name="Hệ thống E-Office" processRef="Process_System" />
+    <bpmn:participant id="Participant_Dir" name="Ban Giám đốc / Quản lý" processRef="Process_Dir" />
+    <bpmn:messageFlow id="Flow_M1" sourceRef="Task_VT_Upload" targetRef="Task_Sys_Wait" />
+    <bpmn:messageFlow id="Flow_M2" sourceRef="Task_Dir_Review" targetRef="Task_Sys_Update" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_VT" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_Receive" name="Nhận Công văn đến">
+      <bpmn:outgoing>Flow_V1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_VT_Upload" name="Scan và Nhập thông tin Công văn">
+      <bpmn:incoming>Flow_V1</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_V1" sourceRef="StartEvent_Receive" targetRef="Task_VT_Upload" />
+  </bpmn:process>
+  <bpmn:process id="Process_System" isExecutable="false">
+    <bpmn:task id="Task_Sys_Wait" name="Chờ trình duyệt chỉ đạo">
+      <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Sys_Update" name="Cập nhật Bút phê &#38; Định tuyến">
+      <bpmn:incoming>Flow_S1</bpmn:incoming>
+      <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Sys_Distribute" name="Cấp số CV &#38; Phân phối đến Phòng ban">
+      <bpmn:incoming>Flow_S2</bpmn:incoming>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_S1" sourceRef="Task_Sys_Wait" targetRef="Task_Sys_Update" />
+    <bpmn:sequenceFlow id="Flow_S2" sourceRef="Task_Sys_Update" targetRef="Task_Sys_Distribute" />
+  </bpmn:process>
+  <bpmn:process id="Process_Dir" isExecutable="false">
+    <bpmn:task id="Task_Dir_Review" name="Ghi Bút phê &#38; Phân công xử lý" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_EOffice">
+    <bpmndi:BPMNPlane id="BPMNPlane_EOffice" bpmnElement="Collaboration_EOffice">
+      <bpmndi:BPMNShape id="Participant_VT_di" bpmnElement="Participant_VT" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="880" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_System_di" bpmnElement="Participant_System" isHorizontal="true">
+        <dc:Bounds x="120" y="250" width="880" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_Dir_di" bpmnElement="Participant_Dir" isHorizontal="true">
+        <dc:Bounds x="120" y="420" width="880" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Receive_di" bpmnElement="StartEvent_Receive">
+        <dc:Bounds x="180" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VT_Upload_di" bpmnElement="Task_VT_Upload">
+        <dc:Bounds x="260" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_V1_di" bpmnElement="Flow_V1">
+        <di:waypoint x="216" y="150" />
+        <di:waypoint x="260" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_Sys_Wait_di" bpmnElement="Task_Sys_Wait">
+        <dc:Bounds x="260" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_Update_di" bpmnElement="Task_Sys_Update">
+        <dc:Bounds x="460" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_Distribute_di" bpmnElement="Task_Sys_Distribute">
+        <dc:Bounds x="650" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_S1_di" bpmnElement="Flow_S1">
+        <di:waypoint x="360" y="320" />
+        <di:waypoint x="460" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S2_di" bpmnElement="Flow_S2">
+        <di:waypoint x="560" y="320" />
+        <di:waypoint x="650" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_Dir_Review_di" bpmnElement="Task_Dir_Review">
+        <dc:Bounds x="460" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_M1_di" bpmnElement="Flow_M1">
+        <di:waypoint x="310" y="190" />
+        <di:waypoint x="310" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_M2_di" bpmnElement="Flow_M2">
+        <di:waypoint x="510" y="450" />
+        <di:waypoint x="510" y="360" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

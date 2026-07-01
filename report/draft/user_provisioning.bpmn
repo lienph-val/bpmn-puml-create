@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Provisioning" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_Provisioning">
+    <bpmn:participant id="Participant_UserProv" name="QUY TRÌNH THÊM MỚI NGƯỜI DÙNG" processRef="Process_Provisioning" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_Provisioning" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_2">
+      <bpmn:lane id="Lane_TenantAdmin2" name="Tenant Administrator">
+        <bpmn:flowNodeRef>StartEvent_Prov</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Dien_Form</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_IAM2" name="Hệ Thống IAM">
+        <bpmn:flowNodeRef>Gateway_Email</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Luu_Data</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Gui_Token</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Employee" name="Employee">
+        <bpmn:flowNodeRef>Task_Set_Pass</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Prov</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_Prov" name="Bắt đầu">
+      <bpmn:outgoing>Flow_P1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_Dien_Form" name="Điền Form thêm mới nhân viên">
+      <bpmn:incoming>Flow_P1</bpmn:incoming>
+      <bpmn:incoming>Flow_Loop</bpmn:incoming>
+      <bpmn:outgoing>Flow_P2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Email" name="Email đã tồn tại?">
+      <bpmn:incoming>Flow_P2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Loop</bpmn:outgoing>
+      <bpmn:outgoing>Flow_P3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:task id="Task_Luu_Data" name="Lưu dữ liệu và tạo Token">
+      <bpmn:incoming>Flow_P3</bpmn:incoming>
+      <bpmn:outgoing>Flow_P4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Gui_Token" name="Gửi Email chứa Link kích hoạt">
+      <bpmn:incoming>Flow_P4</bpmn:incoming>
+      <bpmn:outgoing>Flow_P5</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Set_Pass" name="Truy cập Link và Đặt mật khẩu">
+      <bpmn:incoming>Flow_P5</bpmn:incoming>
+      <bpmn:outgoing>Flow_P6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_Prov" name="Đăng nhập thành công">
+      <bpmn:incoming>Flow_P6</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_P1" sourceRef="StartEvent_Prov" targetRef="Task_Dien_Form" />
+    <bpmn:sequenceFlow id="Flow_P2" sourceRef="Task_Dien_Form" targetRef="Gateway_Email" />
+    <bpmn:sequenceFlow id="Flow_Loop" name="Đã tồn tại" sourceRef="Gateway_Email" targetRef="Task_Dien_Form" />
+    <bpmn:sequenceFlow id="Flow_P3" name="Chưa tồn tại" sourceRef="Gateway_Email" targetRef="Task_Luu_Data" />
+    <bpmn:sequenceFlow id="Flow_P4" sourceRef="Task_Luu_Data" targetRef="Task_Gui_Token" />
+    <bpmn:sequenceFlow id="Flow_P5" sourceRef="Task_Gui_Token" targetRef="Task_Set_Pass" />
+    <bpmn:sequenceFlow id="Flow_P6" sourceRef="Task_Set_Pass" targetRef="EndEvent_Prov" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Prov">
+    <bpmndi:BPMNPlane id="BPMNPlane_Prov" bpmnElement="Collaboration_Provisioning">
+      <bpmndi:BPMNShape id="Participant_UserProv_di" bpmnElement="Participant_UserProv" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="760" height="450" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_TenantAdmin2_di" bpmnElement="Lane_TenantAdmin2" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="730" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_IAM2_di" bpmnElement="Lane_IAM2" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="730" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Employee_di" bpmnElement="Lane_Employee" isHorizontal="true">
+        <dc:Bounds x="190" y="380" width="730" height="150" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartEvent_Prov_di" bpmnElement="StartEvent_Prov">
+        <dc:Bounds x="232" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Dien_Form_di" bpmnElement="Task_Dien_Form">
+        <dc:Bounds x="320" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Gateway_Email_di" bpmnElement="Gateway_Email" isMarkerVisible="true">
+        <dc:Bounds x="345" y="275" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="331" y="335" width="81" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape id="Task_Luu_Data_di" bpmnElement="Task_Luu_Data">
+        <dc:Bounds x="460" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Gui_Token_di" bpmnElement="Task_Gui_Token">
+        <dc:Bounds x="610" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_Set_Pass_di" bpmnElement="Task_Set_Pass">
+        <dc:Bounds x="610" y="410" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Prov_di" bpmnElement="EndEvent_Prov">
+        <dc:Bounds x="762" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_P1_di" bpmnElement="Flow_P1">
+        <di:waypoint x="268" y="150" />
+        <di:waypoint x="320" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P2_di" bpmnElement="Flow_P2">
+        <di:waypoint x="370" y="190" />
+        <di:waypoint x="370" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Loop_di" bpmnElement="Flow_Loop">
+        <di:waypoint x="345" y="300" />
+        <di:waypoint x="290" y="300" />
+        <di:waypoint x="290" y="170" />
+        <di:waypoint x="320" y="170" />
+        <bpmndi:BPMNLabel><dc:Bounds x="296" y="233" width="49" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P3_di" bpmnElement="Flow_P3">
+        <di:waypoint x="395" y="300" />
+        <di:waypoint x="460" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P4_di" bpmnElement="Flow_P4">
+        <di:waypoint x="560" y="300" />
+        <di:waypoint x="610" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P5_di" bpmnElement="Flow_P5">
+        <di:waypoint x="660" y="340" />
+        <di:waypoint x="660" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_P6_di" bpmnElement="Flow_P6">
+        <di:waypoint x="710" y="450" />
+        <di:waypoint x="762" y="450" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

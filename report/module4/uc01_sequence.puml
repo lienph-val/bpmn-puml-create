@@ -1,0 +1,39 @@
+@startuml
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+
+actor "Nhân viên" as Emp
+participant "Mobile App" as App
+participant "Attendance Service" as AttService
+database "Cơ sở dữ liệu" as DB
+
+Emp -> App : Nhấn nút Check-in
+activate App
+
+App -> App : Lấy Tọa độ GPS & IP
+App -> AttService : POST /api/v1/attendance/checkin {lat, long, deviceId}
+activate AttService
+
+AttService -> DB : GET Cấu hình Văn phòng (Office Config)
+activate DB
+DB --> AttService : Tọa độ gốc (Base Lat, Base Long, Radius)
+deactivate DB
+
+AttService -> AttService : Rule: Calculate Distance(GPS, Base)
+alt Khoảng cách > Radius (Bán kính)
+    AttService --> App : 403 Forbidden (Out of Range)
+    App --> Emp : Hiển thị cảnh báo "Sai vị trí"
+else Trong vùng hợp lệ
+    AttService -> DB : INSERT bản ghi Raw_Time_Log
+    activate DB
+    DB --> AttService : OK
+    deactivate DB
+    AttService --> App : 200 OK + Timestamp
+    App --> Emp : Thông báo "Thành công" và hiển thị giờ
+end
+
+deactivate AttService
+deactivate App
+@enduml
