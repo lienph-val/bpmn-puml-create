@@ -1,0 +1,146 @@
+@startuml
+skinparam monochrome true
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Chuyên viên\n(Người thực hiện)" as NV
+boundary "Giao diện" as UI
+control "Hệ thống" as System
+database "CSDL" as DB
+actor "Người quản lý\n(Người giao việc)" as QL
+
+' ========================================================
+' GIAI ĐOẠN 1: CHUYÊN VIÊN GỬI YÊU CẦU GIA HẠN
+' ========================================================
+
+NV -> UI : Chọn công việc đang thực hiện\nvà nhấn "Xin gia hạn"
+activate UI
+
+UI -> System : Yêu cầu mở biểu mẫu xin gia hạn
+activate System
+
+System -> DB : Truy vấn thông tin và thời hạn cũ
+activate DB
+DB --> System : Trả về dữ liệu công việc
+deactivate DB
+
+System --> UI : Trả về dữ liệu biểu mẫu
+deactivate System
+
+UI --> NV : Hiển thị biểu mẫu xin gia hạn\n(kèm thời hạn cũ)
+
+loop Cho đến khi hợp lệ hoặc hủy thao tác
+
+    NV -> UI : Chọn thời hạn mới và nhập lý do
+
+    break Người dùng nhấn "Hủy"
+
+        NV -> UI : Nhấn "Hủy"
+        
+        UI -> System : Yêu cầu hủy bỏ
+        activate System
+
+        System --> UI : Xác nhận hủy,\nkhông lưu dữ liệu
+        deactivate System
+
+        UI --> NV : Đóng biểu mẫu,\nkhông ghi nhận thay đổi
+        
+    end
+
+    NV -> UI : Nhấn "Gửi yêu cầu"
+    
+    UI -> System : Gửi dữ liệu xin gia hạn
+    activate System
+
+    System -> System : Kiểm tra tính hợp lệ dữ liệu\n(theo quy tắc nghiệp vụ)
+    activate System
+    deactivate System
+
+    alt Thời hạn không hợp lệ
+
+        System --> UI : Thông báo thời hạn không hợp lệ
+        
+        activate UI
+        UI --> NV : Hiển thị lỗi và yêu cầu nhập lại
+        deactivate UI
+        
+        deactivate System
+
+    else Thời hạn hợp lệ
+
+        break Gửi yêu cầu thành công
+
+            System -> DB : Lưu yêu cầu và cập nhật\ntrạng thái "Chờ phê duyệt"
+            activate DB
+            DB --> System : Xác nhận lưu thành công
+            deactivate DB
+
+            System -> System : Tạo thông báo xét duyệt
+            activate System
+            deactivate System
+            
+            System -> QL : Gửi thông báo xét duyệt
+
+            System --> UI : Thông báo gửi yêu cầu thành công
+            
+            activate UI
+            UI --> NV : Đóng biểu mẫu,\nhiển thị thông báo
+            deactivate UI
+            
+            deactivate System
+
+        end
+    end
+end
+
+deactivate UI
+
+
+' ========================================================
+' GIAI ĐOẠN 2: NGƯỜI QUẢN LÝ XÉT DUYỆT
+' ========================================================
+
+QL -> System : Mở thông báo xét duyệt
+activate System
+
+System --> QL : Hiển thị chi tiết yêu cầu\n(Lý do, thời hạn cũ,\nthời hạn đề xuất)
+
+alt Quyết định "Đồng ý"
+
+    QL -> System : Chọn "Đồng ý" gia hạn
+
+    System -> DB : Cập nhật deadline mới,\ntrạng thái "Đã phê duyệt"
+    activate DB
+    DB --> System : Xác nhận cập nhật thành công
+    deactivate DB
+
+    System -> DB : Ghi nhận lịch sử xử lý
+    activate DB
+    DB --> System : Xác nhận lưu lịch sử
+    deactivate DB
+
+else Quyết định "Từ chối"
+
+    QL -> System : Nhập lý do và chọn "Từ chối"
+
+    System -> DB : Cập nhật trạng thái "Đã từ chối"\nvà ghi nhận lý do
+    activate DB
+    DB --> System : Xác nhận cập nhật thành công
+    deactivate DB
+
+    System -> DB : Ghi nhận lịch sử xử lý
+    activate DB
+    DB --> System : Xác nhận lưu lịch sử
+    deactivate DB
+
+end
+
+System -> System : Tạo thông báo kết quả
+activate System
+deactivate System
+
+System -> NV : Gửi thông báo kết quả\n(Đồng ý/Từ chối)
+
+deactivate System
+
+@enduml

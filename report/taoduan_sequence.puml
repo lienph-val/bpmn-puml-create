@@ -1,0 +1,102 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Người quản lý" as Manager
+boundary "Giao diện Hệ thống" as UI
+control "Bộ điều khiển" as Controller
+database "Cơ sở dữ liệu" as DB
+
+Manager -> UI : Chọn chức năng "Tạo dự án mới"
+activate UI
+
+UI -> Controller : Yêu cầu mở biểu mẫu tạo dự án
+activate Controller
+Controller --> UI : Trả về biểu mẫu nhập thông tin
+deactivate Controller
+
+UI --> Manager : Hiển thị biểu mẫu nhập thông tin
+
+loop Cho đến khi dữ liệu hợp lệ hoặc hủy
+
+    Manager -> UI : Nhập thông tin cơ bản\nvà chọn thành viên
+
+    break Nhánh 5a: Hủy thao tác
+
+        Manager -> UI : Nhấn nút "Hủy"
+        
+        UI -> Controller : Yêu cầu hủy tạo dự án
+        activate Controller
+
+        Controller --> UI : Xác nhận hủy,\nkhông lưu dữ liệu
+        deactivate Controller
+
+        UI --> Manager : Quay về danh sách dự án
+
+    end
+
+    Manager -> UI : Nhấn nút "Tạo dự án"
+    
+    UI -> Controller : Gửi dữ liệu form
+    activate Controller
+
+    Controller -> Controller : Kiểm tra tính hợp lệ\n(Trường bắt buộc, Logic thời gian)
+    activate Controller
+    deactivate Controller
+
+    alt Nhánh 6a: Thiếu thông tin
+
+        Controller --> UI : Thông báo thiếu\nthông tin bắt buộc
+        
+        activate UI
+        UI --> Manager : Hiển thị lỗi viền đỏ\nvà yêu cầu bổ sung
+        deactivate UI
+
+        deactivate Controller
+
+    else Nhánh 6b: Thời gian không hợp lệ
+
+        Controller --> UI : Thông báo lỗi thời gian
+        
+        activate UI
+        UI --> Manager : Hiển thị lỗi logic\nvà yêu cầu chỉnh sửa
+        deactivate UI
+
+        deactivate Controller
+
+    else Dữ liệu hợp lệ
+
+        break Tạo dự án thành công
+            
+            Controller -> DB : Lưu thông tin dự án mới
+            activate DB
+            DB --> Controller : Trả về Project_ID
+            deactivate DB
+
+            Controller -> DB : Lưu liên kết thành viên\nvào dự án
+            activate DB
+            DB --> Controller : Xác nhận liên kết
+            deactivate DB
+
+            Controller -> Controller : Gửi thông báo đến\ncác thành viên
+            activate Controller
+            deactivate Controller
+
+            Controller --> UI : Yêu cầu chuyển hướng\nđến Chi tiết dự án
+            deactivate Controller
+
+            activate UI
+            UI --> Manager : Hiển thị trang Chi tiết dự án\nvừa tạo
+            deactivate UI
+
+        end
+    end
+
+end
+
+deactivate ÚI
+
+@enduml

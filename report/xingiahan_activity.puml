@@ -1,0 +1,76 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+skinparam activityWidth 180
+skinparam activityHeight 45
+skinparam ActivityPadding 8
+skinparam ArrowThickness 1
+
+|Chuyên viên|
+start
+:Chọn công việc và nhấn\n"Xin gia hạn";
+
+|Hệ thống|
+:Hiển thị biểu mẫu xin gia hạn\n(kèm thời hạn cũ);
+
+repeat
+
+    |Chuyên viên|
+    :Chọn thời hạn mới\nvà nhập lý do;
+
+    if (Lựa chọn thao tác?) then (Hủy)
+
+        |Hệ thống|
+        :Đóng biểu mẫu,\nkhông ghi nhận thay đổi;
+        stop
+
+    else (Gửi yêu cầu)
+
+        |Hệ thống|
+        :Kiểm tra tính hợp lệ\ndữ liệu;
+
+        if (Thời hạn mới hợp lệ?) then (Có)
+
+            :Lưu yêu cầu gia hạn;
+            :Cập nhật trạng thái\n"Chờ phê duyệt";
+            :Gửi thông báo xét duyệt\nđến Người quản lý;
+
+        else (Không)
+
+            :Báo lỗi: Thời hạn mới\nkhông hợp lệ;
+
+        endif
+    endif
+
+repeat while (Thời hạn không hợp lệ?) is (Nhập lại)
+
+|Người quản lý|
+:Xem yêu cầu, lý do\nvà thời hạn đề xuất;
+
+if (Quyết định?) then (Đồng ý)
+
+    |Hệ thống|
+    :Cập nhật thời hạn mới;
+    :Ghi nhận lịch sử\nxử lý (Đồng ý);
+
+else (Từ chối)
+
+    |Người quản lý|
+    :Nhập lý do từ chối;
+
+    |Hệ thống|
+    :Giữ nguyên thời hạn cũ;
+    :Ghi nhận lịch sử\nxử lý (Từ chối);
+
+endif
+
+|Hệ thống|
+:Gửi thông báo kết quả\ncho Chuyên viên;
+
+|Chuyên viên|
+:Tiếp tục thực hiện công việc\n(theo thời hạn được duyệt);
+stop
+
+@enduml

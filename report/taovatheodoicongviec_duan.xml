@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" 
+                  id="Definitions_1" 
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Không chứa thuộc tính name để viền hoàn toàn trống -->
+  <bpmn:collaboration id="Collaboration_QuanLyDuAnChiTiet">
+    <bpmn:participant id="Participant_DuAnChiTiet" processRef="Process_DuAnChiTiet" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_DuAnChiTiet" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_QuanLy" name="Người quản lý (Lãnh đạo, Trưởng phòng, Thư ký)">
+        <bpmn:flowNodeRef>Start_TaoDuAn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_QL_NhapThongTinDuAn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_BoSungHangMuc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_QL_TaoHangMuc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Merge_HangMuc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_QL_TaoVaGiaoViec</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_QL_TheoDoiTienDo</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+      <bpmn:lane id="Lane_HeThong" name="Hệ thống (Kiểm soát &#38; Tự động hóa)">
+        <bpmn:flowNodeRef>Task_Sys_LuuDuAnVaThongBao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_LuuHangMuc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_LuuViecVaThongBao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_CapNhatTienDoDuAn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_DuAn</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_ThanhVien" name="Thành viên dự án (Chuyên viên)">
+        <bpmn:flowNodeRef>Task_TV_NhanThongBaoDuAn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_TV_ChuyenThucHien</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- ================= GIAI ĐOẠN 1: KHỞI TẠO DỰ ÁN ================= -->
+    <bpmn:startEvent id="Start_TaoDuAn" name="Phát sinh dự án mới">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:task id="Task_QL_NhapThongTinDuAn" name="Nhập thông tin dự án, thêm thành viên &#38; nhấn Tạo">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Sys_LuuDuAnVaThongBao" name="Lưu dự án &#38; gửi thông báo tham gia dự án">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_TV_NhanThongBaoDuAn" name="Nhận thông báo tham gia vào dự án">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+    </bpmn:task>
+
+    <!-- ================= GIAI ĐOẠN 2: THIẾT LẬP HẠNG MỤC / GIAI ĐOẠN ================= -->
+    <bpmn:exclusiveGateway id="Gateway_BoSungHangMuc" name="Cần tạo / bổ sung hạng mục/giai đoạn?">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_TaoHM_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TaoHM_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:task id="Task_QL_TaoHangMuc" name="Tạo mới / Bổ sung Hạng mục / Giai đoạn dự án">
+      <bpmn:incoming>Flow_TaoHM_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Sys_LuuHangMuc" name="Lưu cấu trúc Hạng mục / Giai đoạn vào CSDL">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:exclusiveGateway id="Gateway_Merge_HangMuc">
+      <bpmn:incoming>Flow_TaoHM_No</bpmn:incoming>
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- ================= GIAI ĐOẠN 3: TẠO VÀ GIAO CÔNG VIỆC ================= -->
+    <bpmn:task id="Task_QL_TaoVaGiaoViec" name="Chọn Hạng mục, nhập thông tin CV, phân công &#38; thiết lập duyệt">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Sys_LuuViecVaThongBao" name="Lưu công việc &#38; gửi thông báo phân công">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- ================= GIAI ĐOẠN 4: THỰC HIỆN & TỔNG HỢP TIẾN ĐỘ ================= -->
+    <bpmn:task id="Task_TV_ChuyenThucHien" name="Tiếp nhận &#38; chuyển sang Quy trình Thực hiện công việc">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_Sys_CapNhatTienDoDuAn" name="Tự động tổng hợp % tiến độ toàn dự án khi có CV hoàn thành">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:task id="Task_QL_TheoDoiTienDo" name="Theo dõi, đôn đốc tiến độ dự án trên Dashboard">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+
+    <bpmn:endEvent id="End_DuAn" name="Đóng / Hoàn tất quản lý dự án">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ================= SEQUENCE FLOWS ================= -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_TaoDuAn" targetRef="Task_QL_NhapThongTinDuAn" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_QL_NhapThongTinDuAn" targetRef="Task_Sys_LuuDuAnVaThongBao" />
+    
+    <!-- Phân nhánh thông báo cho thành viên và tiếp tục luồng của Quản lý -->
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_Sys_LuuDuAnVaThongBao" targetRef="Task_TV_NhanThongBaoDuAn" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_Sys_LuuDuAnVaThongBao" targetRef="Gateway_BoSungHangMuc" />
+    
+    <!-- Nhánh tạo hạng mục -->
+    <bpmn:sequenceFlow id="Flow_TaoHM_Yes" name="Có" sourceRef="Gateway_BoSungHangMuc" targetRef="Task_QL_TaoHangMuc" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_QL_TaoHangMuc" targetRef="Task_Sys_LuuHangMuc" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_Sys_LuuHangMuc" targetRef="Gateway_Merge_HangMuc" />
+    
+    <!-- Nhánh không tạo thêm hạng mục -->
+    <bpmn:sequenceFlow id="Flow_TaoHM_No" name="Không (Đã có sẵn)" sourceRef="Gateway_BoSungHangMuc" targetRef="Gateway_Merge_HangMuc" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Gateway_Merge_HangMuc" targetRef="Task_QL_TaoVaGiaoViec" />
+    
+    <!-- Tạo công việc và chuyển tiếp -->
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_QL_TaoVaGiaoViec" targetRef="Task_Sys_LuuViecVaThongBao" />
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_Sys_LuuViecVaThongBao" targetRef="Task_TV_ChuyenThucHien" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_TV_ChuyenThucHien" targetRef="Task_Sys_CapNhatTienDoDuAn" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_Sys_CapNhatTienDoDuAn" targetRef="Task_QL_TheoDoiTienDo" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_QL_TheoDoiTienDo" targetRef="End_DuAn" />
+
+  </bpmn:process>
+
+  <!-- ================= BPMNDI: TỌA ĐỘ HIỂN THỊ (3 LÀN DỌC) ================= -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_QuanLyDuAnChiTiet">
+      
+      <!-- Bể dọc (KHÔNG TÊN) -->
+      <bpmndi:BPMNShape id="Participant_DuAnChiTiet_di" bpmnElement="Participant_DuAnChiTiet" isHorizontal="false">
+        <dc:Bounds x="100" y="50" width="1050" height="1500" />
+      </bpmndi:BPMNShape>
+      
+      <!-- 3 Làn dọc (Rộng 350 mỗi làn) -->
+      <bpmndi:BPMNShape id="Lane_QuanLy_di" bpmnElement="Lane_QuanLy" isHorizontal="false">
+        <dc:Bounds x="100" y="50" width="350" height="1500" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_HeThong_di" bpmnElement="Lane_HeThong" isHorizontal="false">
+        <dc:Bounds x="450" y="50" width="350" height="1500" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_ThanhVien_di" bpmnElement="Lane_ThanhVien" isHorizontal="false">
+        <dc:Bounds x="800" y="50" width="350" height="1500" />
+      </bpmndi:BPMNShape>
+
+      <!-- ================= SHAPES: LÀN QUẢN LÝ (Center X = 275) ================= -->
+      <bpmndi:BPMNShape id="Start_TaoDuAn_di" bpmnElement="Start_TaoDuAn">
+        <dc:Bounds x="257" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="238" y="70" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QL_NhapThongTinDuAn_di" bpmnElement="Task_QL_NhapThongTinDuAn">
+        <dc:Bounds x="225" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Cổng kiểm tra hạng mục -->
+      <bpmndi:BPMNShape id="Gateway_BoSungHangMuc_di" bpmnElement="Gateway_BoSungHangMuc" isMarkerVisible="true">
+        <dc:Bounds x="250" y="390" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="401" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QL_TaoHangMuc_di" bpmnElement="Task_QL_TaoHangMuc">
+        <dc:Bounds x="225" y="490" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Merge_HangMuc_di" bpmnElement="Gateway_Merge_HangMuc" isMarkerVisible="true">
+        <dc:Bounds x="250" y="690" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Tạo và giao công việc -->
+      <bpmndi:BPMNShape id="Task_QL_TaoVaGiaoViec_di" bpmnElement="Task_QL_TaoVaGiaoViec">
+        <dc:Bounds x="225" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QL_TheoDoiTienDo_di" bpmnElement="Task_QL_TheoDoiTienDo">
+        <dc:Bounds x="225" y="1280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- ================= SHAPES: LÀN HỆ THỐNG (Center X = 625) ================= -->
+      <bpmndi:BPMNShape id="Task_Sys_LuuDuAnVaThongBao_di" bpmnElement="Task_Sys_LuuDuAnVaThongBao">
+        <dc:Bounds x="575" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_LuuHangMuc_di" bpmnElement="Task_Sys_LuuHangMuc">
+        <dc:Bounds x="575" y="490" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_LuuViecVaThongBao_di" bpmnElement="Task_Sys_LuuViecVaThongBao">
+        <dc:Bounds x="575" y="880" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_CapNhatTienDoDuAn_di" bpmnElement="Task_Sys_CapNhatTienDoDuAn">
+        <dc:Bounds x="575" y="1160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_DuAn_di" bpmnElement="End_DuAn">
+        <dc:Bounds x="607" y="1400" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="585" y="1443" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- ================= SHAPES: LÀN THÀNH VIÊN (Center X = 975) ================= -->
+      <bpmndi:BPMNShape id="Task_TV_NhanThongBaoDuAn_di" bpmnElement="Task_TV_NhanThongBaoDuAn">
+        <dc:Bounds x="925" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TV_ChuyenThucHien_di" bpmnElement="Task_TV_ChuyenThucHien">
+        <dc:Bounds x="925" y="1020" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- ================= EDGES (Căn chỉnh định tuyến) ================= -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="275" y="136" />
+        <di:waypoint x="275" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="275" y="260" />
+        <di:waypoint x="275" y="320" />
+        <di:waypoint x="575" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="675" y="320" />
+        <di:waypoint x="925" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="625" y="360" />
+        <di:waypoint x="625" y="415" />
+        <di:waypoint x="300" y="415" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Nhánh Tạo Hạng mục -->
+      <bpmndi:BPMNEdge id="Flow_TaoHM_Yes_di" bpmnElement="Flow_TaoHM_Yes">
+        <di:waypoint x="275" y="440" />
+        <di:waypoint x="275" y="490" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="282" y="453" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="325" y="530" />
+        <di:waypoint x="575" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="625" y="570" />
+        <di:waypoint x="625" y="715" />
+        <di:waypoint x="300" y="715" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Nhánh Không tạo thêm Hạng mục (Bọc lề trái X=170) -->
+      <bpmndi:BPMNEdge id="Flow_TaoHM_No_di" bpmnElement="Flow_TaoHM_No">
+        <di:waypoint x="250" y="415" />
+        <di:waypoint x="170" y="415" />
+        <di:waypoint x="170" y="715" />
+        <di:waypoint x="250" y="715" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="175" y="550" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="275" y="740" />
+        <di:waypoint x="275" y="780" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="275" y="860" />
+        <di:waypoint x="275" y="920" />
+        <di:waypoint x="575" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="625" y="960" />
+        <di:waypoint x="625" y="1060" />
+        <di:waypoint x="925" y="1060" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="975" y="1100" />
+        <di:waypoint x="975" y="1200" />
+        <di:waypoint x="675" y="1200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="625" y="1240" />
+        <di:waypoint x="625" y="1320" />
+        <di:waypoint x="325" y="1320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="275" y="1360" />
+        <di:waypoint x="275" y="1418" />
+        <di:waypoint x="607" y="1418" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

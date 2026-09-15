@@ -1,0 +1,60 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+skinparam activityWidth 180
+skinparam activityHeight 45
+skinparam ActivityPadding 8
+skinparam ArrowThickness 1
+
+|Người phê duyệt\n(Người giao việc)|
+start
+
+:Truy cập danh sách công việc\n"Chờ duyệt";
+:Chọn công việc để xem chi tiết\n(Báo cáo, tài liệu đính kèm);
+:Chọn chức năng\n"Phê duyệt / Đánh giá";
+
+|Hệ thống|
+:Hiển thị biểu mẫu phê duyệt;
+
+|Người phê duyệt\n(Người giao việc)|
+:Chọn kết quả (Đạt / Không đạt)\nvà nhập nhận xét hoặc lý do;
+
+if (Lựa chọn thao tác?) then (Hủy)
+
+    |Hệ thống|
+    :Đóng biểu mẫu,\nkhông lưu thay đổi;
+    :Giữ nguyên trạng thái\n"Chờ duyệt";
+    stop
+
+else (Xác nhận)
+
+    |Hệ thống|
+
+    if (Kết quả phê duyệt?) then (Đạt)
+
+        :Lưu quyết định phê duyệt\nvà nhận xét;
+        :Cập nhật trạng thái công việc\nthành "Đã hoàn thành";
+        :Ghi nhận lịch sử xử lý;
+        :Gửi thông báo kết quả phê duyệt\ncho Chuyên viên;
+
+        |Chuyên viên\n(Người thực hiện)|
+        :Tiếp nhận thông báo;\nCông việc hoàn tất;
+        stop
+
+    else (Không đạt)
+
+        :Lưu quyết định và lý do\nyêu cầu làm lại;
+        :Cập nhật trạng thái công việc\nthành "Đang thực hiện";
+        :Ghi nhận lịch sử xử lý;
+        :Gửi thông báo yêu cầu làm lại\ncho Chuyên viên;
+
+        |Chuyên viên\n(Người thực hiện)|
+        :Tiếp nhận thông báo;\nTiếp tục thực hiện công việc;
+        stop
+
+    endif
+endif
+
+@enduml

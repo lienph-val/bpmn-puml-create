@@ -1,0 +1,81 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+|Người dùng|
+start
+:Chọn chức năng "Giao việc";
+
+|Hệ thống|
+:Kiểm tra vai trò người dùng;
+
+' =========================
+' 1. PHÂN QUYỀN NGƯỜI DÙNG
+' =========================
+
+switch (Vai trò người dùng?)
+
+case (Lãnh đạo)
+    :Hiển thị biểu mẫu giao việc;
+    :Load danh sách người nhận:\nToàn bộ nhân sự;
+
+case (Thư ký)
+    :Hiển thị biểu mẫu giao việc;
+    :Hiển thị tùy chọn\n"Giao việc thay Lãnh đạo";
+    :Load danh sách người nhận:\nCác Trưởng phòng;
+
+case (Trưởng phòng)
+    :Hiển thị biểu mẫu giao việc;
+    :Load danh sách người nhận:\nChuyên viên trực thuộc;
+
+endswitch
+
+' =========================
+' 2. NHẬP VÀ KIỂM TRA
+' =========================
+
+repeat
+
+    |Người dùng|
+    :Nhập/chỉnh sửa thông tin công việc,\nchọn người nhận, thời hạn\nvà thiết lập yêu cầu phê duyệt;
+
+    if (Lựa chọn thao tác?) then (Nhấn "Hủy")
+
+        |Hệ thống|
+        :Không lưu dữ liệu;
+        :Đóng biểu mẫu,\nquay về màn hình trước đó;
+        stop
+
+    else (Nhấn "Xác nhận giao việc")
+
+        |Hệ thống|
+        :Kiểm tra tính hợp lệ\ncủa dữ liệu đầu vào;
+
+        if (Dữ liệu hợp lệ?) then (Không)
+
+            if (Nguyên nhân lỗi?) then (Thiếu thông tin)
+
+                :Hiển thị lỗi màu đỏ\ntại trường bắt buộc;
+
+            else (Thời hạn không hợp lệ)
+
+                :Hiển thị cảnh báo thời hạn\nkhông được nhỏ hơn hiện tại;
+
+            endif
+
+        else (Có)
+
+            :Lưu dữ liệu công việc vào CSDL;
+            :Cập nhật trạng thái phân công\nvà gán cho người nhận;
+            :Gửi thông báo (Notification/Email)\nđến người nhận việc;
+            :Đóng biểu mẫu;
+            stop
+
+        endif
+
+    endif
+
+repeat while (Dữ liệu không hợp lệ?) is (Nhập lại)
+
+@enduml

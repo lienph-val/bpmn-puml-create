@@ -1,0 +1,75 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor LightCyan
+    BorderColor #2A2A2A
+}
+
+' ĐỊNH NGHĨA ACTOR (Mặc định là hình người nét mảnh)
+actor "Chuyên viên" as CV
+actor "Trưởng phòng" as TP
+actor "Thư ký lãnh đạo" as TK
+actor "Lãnh đạo" as LD
+
+' QUAN HỆ KẾ THỪA (GENERALIZATION)
+TP -|> CV
+TK -|> CV
+LD -|> TP
+
+rectangle "Hệ thống Quản lý Công việc & Dự án" {
+
+    ' Các Use Case của Chuyên viên
+    usecase "Tạo công việc cá nhân" as UC_TaoCV
+    usecase "Tiếp nhận công việc được giao" as UC_NhanCV
+    usecase "Thực hiện công việc" as UC_ThucHienCV
+    usecase "Cập nhật tiến độ và kết quả" as UC_CapNhat
+    usecase "Gửi duyệt công việc" as UC_GuiDuyet
+    usecase "Xin gia hạn công việc" as UC_GiaHan
+
+    ' Các Use Case của Trưởng phòng
+    usecase "Tạo và quản lý dự án" as UC_TaoDA
+    usecase "Giao việc cho nhân viên" as UC_GiaoViec
+    usecase "Phê duyệt và đánh giá công việc" as UC_PheDuyet
+    usecase "Theo dõi công việc phòng ban" as UC_TheoDoiPB
+
+    ' Các Use Case của Thư ký
+    usecase "Giao việc theo ủy quyền" as UC_GiaoViecTK
+
+    ' Use Case dùng chung cho TP, TK và LD
+    usecase "Theo dõi, giám sát dự án" as UC_GiamSatDA
+
+    ' Các Use Case của Lãnh đạo
+    usecase "Giám sát công việc toàn doanh nghiệp" as UC_GiamSatCT
+}
+
+' ================= NỐI USE CASE VỚI ACTOR =================
+
+' 1. Chuyên viên
+CV --> UC_TaoCV
+CV --> UC_NhanCV
+CV --> UC_ThucHienCV
+CV --> UC_CapNhat
+CV --> UC_GuiDuyet
+CV --> UC_GiaHan
+
+' 2. Trưởng phòng (Đã tự động có quyền của CV)
+TP --> UC_TaoDA
+TP --> UC_GiaoViec
+TP --> UC_PheDuyet
+TP --> UC_TheoDoiPB
+TP --> UC_GiamSatDA
+
+' 3. Thư ký lãnh đạo (Đã tự động có quyền của CV)
+TK --> UC_GiaoViecTK
+TK --> UC_GiamSatDA
+
+' 4. Lãnh đạo (Đã tự động có quyền của TP và CV)
+' Nhờ kế thừa từ Trưởng phòng, Lãnh đạo đã tự động kết nối ngầm với:
+' - Giao việc cho nhân viên
+' - Phê duyệt và đánh giá công việc
+' - Theo dõi, giám sát dự án
+' Do đó, chỉ cần nối trực tiếp Lãnh đạo với quyền tối cao để chống rối nét vẽ.
+LD --> UC_GiamSatCT
+
+@enduml

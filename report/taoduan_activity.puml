@@ -1,0 +1,69 @@
+@startuml
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam defaultTextAlignment center
+
+skinparam activityWidth 180
+skinparam activityHeight 45
+skinparam ActivityPadding 8
+skinparam ArrowThickness 1
+
+|Người quản lý|
+start
+
+:Chọn chức năng\n"Tạo dự án mới";
+
+|Hệ thống|
+:Hiển thị biểu mẫu\nnhập thông tin dự án;
+
+|Người quản lý|
+
+repeat
+
+    :Điền thông tin cơ bản\n(Tên, Mô tả, Thời gian);
+    :Tìm kiếm và thêm nhân sự;
+
+    if (Hành động tiếp theo?) then (Hủy)
+
+        |Hệ thống|
+        :Đóng biểu mẫu,\nkhông lưu dữ liệu;
+        :Quay về danh sách dự án;
+        stop
+
+    else (Tạo dự án)
+
+        |Hệ thống|
+        :Kiểm tra tính hợp lệ\ncủa thông tin;
+
+        if (Dữ liệu hợp lệ?) then (Có)
+
+            :Lưu thông tin dự án\nvào CSDL;
+            :Liên kết các thành viên\nvào dự án;
+            :Gửi thông báo\nđến các thành viên;
+            :Chuyển hướng đến trang\nChi tiết dự án;
+            stop
+
+        else (Không)
+
+            if (Nguyên nhân lỗi?) then (Thiếu thông tin)
+
+                :Báo lỗi tại trường\nbắt buộc bị bỏ trống;
+
+            else (Thời gian không hợp lệ)
+
+                :Báo lỗi: Thời gian kết thúc\nkhông được nhỏ hơn thời gian bắt đầu;
+
+            endif
+
+            |Người quản lý|
+
+        endif
+
+    endif
+
+repeat while (Tiếp tục chỉnh sửa?) is (Có)
+
+stop
+
+@enduml

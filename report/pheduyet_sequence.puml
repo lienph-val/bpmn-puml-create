@@ -1,0 +1,112 @@
+@startuml
+skinparam monochrome true
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Người phê duyệt\n(Trưởng phòng/Lãnh đạo)" as PD
+boundary "Giao diện" as UI
+control "Hệ thống" as System
+database "CSDL" as DB
+actor "Chuyên viên\n(Người thực hiện)" as NV
+
+' ========================================================
+' GIAI ĐOẠN 1: TRUY CẬP VÀ MỞ BIỂU MẪU PHÊ DUYỆT
+' ========================================================
+
+PD -> UI : Truy cập danh sách công việc "Chờ duyệt"\nvà chọn công việc cần xem
+activate UI
+
+UI -> System : Yêu cầu lấy thông tin chi tiết công việc\n(Báo cáo, tài liệu đính kèm)
+activate System
+
+System -> DB : Truy vấn dữ liệu chi tiết công việc
+activate DB
+DB --> System : Trả về thông tin chi tiết
+deactivate DB
+
+System --> UI : Trả về dữ liệu chi tiết
+deactivate System
+
+UI --> PD : Hiển thị chi tiết công việc
+deactivate UI
+
+PD -> UI : Chọn chức năng "Phê duyệt / Đánh giá"
+activate UI
+
+UI -> System : Yêu cầu mở biểu mẫu phê duyệt
+activate System
+
+System --> UI : Trả về biểu mẫu
+deactivate System
+
+UI --> PD : Hiển thị biểu mẫu phê duyệt
+deactivate UI
+
+' ========================================================
+' GIAI ĐOẠN 2: THỰC HIỆN PHÊ DUYỆT HOẶC TỪ CHỐI
+' ========================================================
+
+PD -> UI : Nhập nhận xét/đánh giá và chọn kết quả\n(Đạt yêu cầu / Không đạt yêu cầu)
+activate UI
+
+alt Người dùng nhấn "Hủy"
+    PD -> UI : Nhấn "Hủy"
+    
+    UI -> System : Yêu cầu đóng biểu mẫu
+    activate System
+    
+    System --> UI : Xác nhận không lưu thay đổi\n(Giữ nguyên trạng thái "Chờ duyệt")
+    deactivate System
+    
+    UI --> PD : Đóng biểu mẫu, quay về màn hình trước
+    
+else Người dùng nhấn "Xác nhận"
+    PD -> UI : Nhấn "Xác nhận"
+    
+    UI -> System : Gửi kết quả phê duyệt
+    activate System
+    
+    System -> System : Xử lý kết quả đánh giá
+    activate System
+    deactivate System
+    
+    alt Kết quả: "Đạt yêu cầu"
+    
+        System -> DB : Lưu quyết định, cập nhật trạng thái "Đã hoàn thành"\nvà ghi nhận lịch sử xử lý
+        activate DB
+        DB --> System : Xác nhận thành công
+        deactivate DB
+        
+        System -> System : Tạo thông báo phê duyệt
+        activate System
+        deactivate System
+        
+        System -> NV : Gửi thông báo phê duyệt công việc
+        
+        System --> UI : Trả về thông báo thành công
+        
+        UI --> PD : Đóng biểu mẫu, hiển thị thông báo hoàn tất
+        
+    else Kết quả: "Không đạt yêu cầu" (Yêu cầu làm lại)
+    
+        System -> DB : Lưu quyết định, cập nhật trạng thái "Đang thực hiện"\nvà ghi nhận lịch sử từ chối
+        activate DB
+        DB --> System : Xác nhận thành công
+        deactivate DB
+        
+        System -> System : Tạo thông báo yêu cầu làm lại
+        activate System
+        deactivate System
+        
+        System -> NV : Gửi thông báo yêu cầu làm lại công việc
+        
+        System --> UI : Trả về thông báo thành công
+        
+        UI --> PD : Đóng biểu mẫu, hiển thị thông báo đã gửi trả lại
+        
+    end
+    deactivate System
+end
+deactivate UI
+
+@enduml

@@ -1,0 +1,135 @@
+@startuml
+skinparam monochrome true
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor "Người dùng\n(Quản lý)" as User
+boundary "Giao diện\nQuản lý công việc" as UI
+control "Hệ thống\nquản lý công việc" as System
+database "CSDL" as DB
+
+' =========================
+' 1. KHỞI TẠO BIỂU MẪU
+' =========================
+
+User -> UI : Chọn chức năng "Giao việc"
+activate UI
+
+UI -> System : Yêu cầu mở biểu mẫu giao việc
+activate System
+
+System -> System : Kiểm tra vai trò người dùng
+activate System
+deactivate System
+
+alt Vai trò Lãnh đạo
+
+    System -> DB : Yêu cầu danh sách toàn bộ nhân sự
+    activate DB
+    DB --> System : Trả về danh sách nhân sự
+    deactivate DB
+
+else Vai trò Thư ký
+
+    System -> DB : Yêu cầu danh sách các Trưởng phòng
+    activate DB
+    DB --> System : Trả về danh sách Trưởng phòng
+    deactivate DB
+
+else  Vai trò Trưởng phòng
+
+    System -> DB : Yêu cầu danh sách Chuyên viên trực thuộc
+    activate DB
+    DB --> System : Trả về danh sách Chuyên viên
+    deactivate DB
+
+end
+
+System --> UI : Trả về dữ liệu biểu mẫu & danh sách
+deactivate System
+
+UI --> User : Hiển thị biểu mẫu\n(kèm tùy chọn riêng nếu là Thư ký)
+
+
+' =========================
+' 2. NHẬP VÀ XỬ LÝ
+' =========================
+
+loop Cho đến khi dữ liệu hợp lệ hoặc người dùng hủy
+
+    User -> UI : Nhập thông tin, chọn người nhận,\ndeadline và thiết lập "Yêu cầu phê duyệt"
+
+    break Người dùng nhấn "Hủy"
+
+        User -> UI : Nhấn "Hủy"
+
+        UI -> System : Yêu cầu đóng biểu mẫu
+        activate System
+
+        System --> UI : Xác nhận đóng,\nkhông lưu dữ liệu
+        deactivate System
+
+        UI --> User : Quay về màn hình trước đó
+
+    end
+
+    User -> UI : Nhấn "Xác nhận giao việc"
+
+    UI -> System : Gửi thông tin công việc
+    activate System
+
+    System -> System : Kiểm tra tính hợp lệ dữ liệu
+    activate System
+    deactivate System
+
+    alt Thiếu thông tin bắt buộc
+
+        System --> UI : Báo lỗi thiếu trường bắt buộc
+
+        activate UI
+        UI --> User : Hiển thị lỗi màu đỏ\ntại trường tương ứng
+        deactivate UI
+
+        deactivate System
+
+    else Thời hạn không hợp lệ
+
+        System --> UI : Báo lỗi thời hạn\nnhỏ hơn thời gian hiện tại
+
+        activate UI
+        UI --> User : Hiển thị cảnh báo\nvà yêu cầu chọn lại
+        deactivate UI
+
+        deactivate System
+
+    else Dữ liệu hợp lệ
+
+        break Lưu thành công và kết thúc
+
+            System -> DB : Lưu dữ liệu công việc
+            activate DB
+            DB --> System : Xác nhận lưu thành công
+            deactivate DB
+
+            System -> System : Cập nhật trạng thái phân công\nvà gán cho người nhận
+            activate System
+            deactivate System
+
+            System -> System : Tạo thông báo\n(Notification/Email)
+            activate System
+            deactivate System
+
+            System --> UI : Thông báo giao việc thành công
+
+            activate UI
+            UI --> User : Đóng biểu mẫu và hiển thị\nthông báo thành công
+            deactivate UI
+            
+            deactivate System
+        end
+    end
+end
+
+deactivate UI
+
+@enduml

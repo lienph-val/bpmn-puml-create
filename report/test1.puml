@@ -1,0 +1,79 @@
+@startuml
+!theme plain
+autonumber
+skinparam maxMessageSize 150
+
+actor "Người dùng" as User
+boundary "Giao diện\nQuản lý công việc" as UI
+control "Hệ thống\nquản lý công việc" as System
+database "CSDL" as DB
+
+User -> UI: Chọn chức năng "Tạo công việc"
+activate UI
+UI -> System: Yêu cầu mở biểu mẫu
+activate System
+System --> UI: Hiển thị biểu mẫu khởi tạo
+deactivate System
+UI --> User: Hiển thị biểu mẫu
+
+loop Cho đến khi dữ liệu hợp lệ hoặc người dùng hủy
+    User -> UI: Nhập/chỉnh sửa thông tin\n(Tên CV, Mô tả, Deadline,\nƯu tiên, Tài liệu đính kèm)
+    
+    break Người dùng nhấn "Hủy"
+        User -> UI: Nhấn "Hủy"
+        UI -> System: Yêu cầu hủy tạo công việc
+        activate System
+        System --> UI: Đóng biểu mẫu, không lưu dữ liệu
+        deactivate System
+        UI --> User: Hiển thị màn hình trước đó
+    end
+
+    User -> UI: Nhấn "Xác nhận" / "Lưu"
+    UI -> System: Gửi thông tin công việc
+    activate System
+    
+    ' Self-message cho việc kiểm tra dữ liệu '
+    System -> System: Kiểm tra tính hợp lệ dữ liệu
+    activate System
+    deactivate System
+    
+    alt Thiếu thông tin bắt buộc
+        System --> UI: Thông báo lỗi thiếu trường bắt buộc
+        UI --> User: Hiển thị lỗi màu đỏ tại trường tương ứng
+        
+    else Deadline không hợp lệ
+        System --> UI: Thông báo Deadline không hợp lệ
+        UI --> User: Hiển thị cảnh báo và yêu cầu chọn lại
+        
+    else Dữ liệu hợp lệ
+        break Lưu thành công và kết thúc
+            ' Self-messages cho xử lý logic nội bộ '
+            System -> System: Gán người thực hiện\nlà người khởi tạo
+            activate System
+            deactivate System
+            
+            System -> System: Thiết lập công việc cá nhân
+            activate System
+            deactivate System
+            
+            ' Tương tác CSDL '
+            System -> DB: Lưu dữ liệu công việc
+            activate DB
+            DB --> System: Xác nhận lưu thành công
+            deactivate DB
+            
+            System --> UI: Thông báo tạo công việc thành công
+            
+            System -> DB: Truy vấn danh sách công việc cá nhân
+            activate DB
+            DB --> System: Trả về danh sách cập nhật
+            deactivate DB
+            
+            System --> UI: Cập nhật danh sách công việc
+            UI --> User: Hiển thị công việc vừa tạo
+        end
+    end
+    deactivate System
+end
+deactivate UI
+@enduml

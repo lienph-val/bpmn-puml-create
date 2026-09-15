@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" 
+                  id="Definitions_1" 
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  
+  <!-- Không chứa thuộc tính name để ẩn tên quy trình -->
+  <bpmn:collaboration id="Collaboration_QuyTrinhPheDuyet">
+    <bpmn:participant id="Participant_PheDuyet" processRef="Process_PheDuyet" />
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_PheDuyet" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_NguoiPheDuyet" name="Người phê duyệt (Lãnh đạo, Trưởng phòng)">
+        <bpmn:flowNodeRef>Task_PD_XemXet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_QuyetDinh</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PD_TuChoi</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PD_XacNhan</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+      <bpmn:lane id="Lane_HeThong" name="Hệ thống (Kiểm soát &#38; Xử lý)">
+        <bpmn:flowNodeRef>Start_ChoDuyet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_BaoDuyet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_CapNhatDangLam</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_CapNhatHT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_BaoHT</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_NguoiThucHien" name="Người thực hiện (Chuyên viên)">
+        <bpmn:flowNodeRef>Task_TH_NhanLamLai</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_LamLai</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_HoanThanh</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- ================= LÀN HỆ THỐNG: KHỞI ĐẦU ================= -->
+    <bpmn:startEvent id="Start_ChoDuyet" name="Công việc chuyển sang &#34;Chờ duyệt&#34;">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_Sys_BaoDuyet" name="Hệ thống gửi thông báo yêu cầu phê duyệt">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+
+    <!-- ================= LÀN NGƯỜI PHÊ DUYỆT ================= -->
+    <bpmn:task id="Task_PD_XemXet" name="Xem xét báo cáo &#38; tài liệu đính kèm">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:task>
+    
+    <!-- Cổng XOR (Exclusive) Yêu cầu chỉ được chọn Đạt hoặc Không đạt -->
+    <bpmn:exclusiveGateway id="Gateway_QuyetDinh" name="Kết quả đạt yêu cầu (XOR)?">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_No</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Yes</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- NHÁNH 1: KHÔNG ĐẠT (TỪ CHỐI / LÀM LẠI) -->
+    <bpmn:task id="Task_PD_TuChoi" name="Từ chối &#38; Nhập lý do yêu cầu làm lại">
+      <bpmn:incoming>Flow_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_No_Sys</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Sys_CapNhatDangLam" name="Chuyển lại trạng thái &#34;Đang thực hiện&#34;">
+      <bpmn:incoming>Flow_No_Sys</bpmn:incoming>
+      <bpmn:outgoing>Flow_No_TH</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_TH_NhanLamLai" name="Nhận thông báo yêu cầu làm lại">
+      <bpmn:incoming>Flow_No_TH</bpmn:incoming>
+      <bpmn:outgoing>Flow_No_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_LamLai" name="Quay lại Quy trình Thực hiện">
+      <bpmn:incoming>Flow_No_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- NHÁNH 2: ĐẠT (PHÊ DUYỆT / HOÀN THÀNH) -->
+    <bpmn:task id="Task_PD_XacNhan" name="Xác nhận phê duyệt công việc">
+      <bpmn:incoming>Flow_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_Yes_Sys1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Sys_CapNhatHT" name="Cập nhật trạng thái &#34;Đã hoàn thành&#34;">
+      <bpmn:incoming>Flow_Yes_Sys1</bpmn:incoming>
+      <bpmn:outgoing>Flow_Yes_Sys2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_Sys_BaoHT" name="Ghi nhận lịch sử &#38; Thông báo hoàn thành">
+      <bpmn:incoming>Flow_Yes_Sys2</bpmn:incoming>
+      <bpmn:outgoing>Flow_Yes_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="End_HoanThanh" name="Kết thúc vòng đời công việc">
+      <bpmn:incoming>Flow_Yes_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ================= SEQUENCE FLOWS ================= -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="Start_ChoDuyet" targetRef="Task_Sys_BaoDuyet" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_Sys_BaoDuyet" targetRef="Task_PD_XemXet" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_PD_XemXet" targetRef="Gateway_QuyetDinh" />
+    
+    <!-- Flow nhánh Từ chối -->
+    <bpmn:sequenceFlow id="Flow_No" name="Không đạt (Làm lại)" sourceRef="Gateway_QuyetDinh" targetRef="Task_PD_TuChoi" />
+    <bpmn:sequenceFlow id="Flow_No_Sys" sourceRef="Task_PD_TuChoi" targetRef="Task_Sys_CapNhatDangLam" />
+    <bpmn:sequenceFlow id="Flow_No_TH" sourceRef="Task_Sys_CapNhatDangLam" targetRef="Task_TH_NhanLamLai" />
+    <bpmn:sequenceFlow id="Flow_No_End" sourceRef="Task_TH_NhanLamLai" targetRef="End_LamLai" />
+
+    <!-- Flow nhánh Phê duyệt -->
+    <bpmn:sequenceFlow id="Flow_Yes" name="Đạt yêu cầu" sourceRef="Gateway_QuyetDinh" targetRef="Task_PD_XacNhan" />
+    <bpmn:sequenceFlow id="Flow_Yes_Sys1" sourceRef="Task_PD_XacNhan" targetRef="Task_Sys_CapNhatHT" />
+    <bpmn:sequenceFlow id="Flow_Yes_Sys2" sourceRef="Task_Sys_CapNhatHT" targetRef="Task_Sys_BaoHT" />
+    <bpmn:sequenceFlow id="Flow_Yes_End" sourceRef="Task_Sys_BaoHT" targetRef="End_HoanThanh" />
+
+  </bpmn:process>
+
+  <!-- ================= BPMNDI: TỌA ĐỘ HIỂN THỊ (3 LÀN DỌC) ================= -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_QuyTrinhPheDuyet">
+      
+      <!-- Bể dọc (KHÔNG TÊN) -->
+      <bpmndi:BPMNShape id="Participant_PheDuyet_di" bpmnElement="Participant_PheDuyet" isHorizontal="false">
+        <dc:Bounds x="100" y="50" width="1050" height="900" />
+      </bpmndi:BPMNShape>
+      
+      <!-- 3 Làn dọc -->
+      <bpmndi:BPMNShape id="Lane_NguoiPheDuyet_di" bpmnElement="Lane_NguoiPheDuyet" isHorizontal="false">
+        <dc:Bounds x="100" y="50" width="350" height="900" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_HeThong_di" bpmnElement="Lane_HeThong" isHorizontal="false">
+        <dc:Bounds x="450" y="50" width="350" height="900" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_NguoiThucHien_di" bpmnElement="Lane_NguoiThucHien" isHorizontal="false">
+        <dc:Bounds x="800" y="50" width="350" height="900" />
+      </bpmndi:BPMNShape>
+
+      <!-- SHAPES: Hệ thống Khởi đầu -->
+      <bpmndi:BPMNShape id="Start_ChoDuyet_di" bpmnElement="Start_ChoDuyet">
+        <dc:Bounds x="607" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="585" y="70" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_BaoDuyet_di" bpmnElement="Task_Sys_BaoDuyet">
+        <dc:Bounds x="575" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- SHAPES: Người phê duyệt -->
+      <bpmndi:BPMNShape id="Task_PD_XemXet_di" bpmnElement="Task_PD_XemXet">
+        <dc:Bounds x="225" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_QuyetDinh_di" bpmnElement="Gateway_QuyetDinh" isMarkerVisible="true">
+        <dc:Bounds x="250" y="400" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="295" y="388" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- SHAPES: Nhánh Không Đạt (Làm lại) - Thẳng hàng Y=500 -->
+      <bpmndi:BPMNShape id="Task_PD_TuChoi_di" bpmnElement="Task_PD_TuChoi">
+        <dc:Bounds x="225" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_CapNhatDangLam_di" bpmnElement="Task_Sys_CapNhatDangLam">
+        <dc:Bounds x="575" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TH_NhanLamLai_di" bpmnElement="Task_TH_NhanLamLai">
+        <dc:Bounds x="925" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_LamLai_di" bpmnElement="End_LamLai">
+        <dc:Bounds x="957" y="620" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="935" y="663" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- SHAPES: Nhánh Đạt (Hoàn thành) - Thẳng hàng Y=700 & 820 -->
+      <bpmndi:BPMNShape id="Task_PD_XacNhan_di" bpmnElement="Task_PD_XacNhan">
+        <dc:Bounds x="225" y="700" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_CapNhatHT_di" bpmnElement="Task_Sys_CapNhatHT">
+        <dc:Bounds x="575" y="700" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Sys_BaoHT_di" bpmnElement="Task_Sys_BaoHT">
+        <dc:Bounds x="575" y="820" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_HoanThanh_di" bpmnElement="End_HoanThanh">
+        <dc:Bounds x="957" y="842" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="935" y="885" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- ================= EDGES (Căn chỉnh tọa độ) ================= -->
+      <!-- Điểm khởi đầu -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="625" y="136" />
+        <di:waypoint x="625" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="625" y="260" />
+        <di:waypoint x="625" y="320" />
+        <di:waypoint x="325" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="275" y="360" />
+        <di:waypoint x="275" y="400" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Rẽ nhánh Yêu cầu làm lại (Thẳng xuống) -->
+      <bpmndi:BPMNEdge id="Flow_No_di" bpmnElement="Flow_No">
+        <di:waypoint x="275" y="450" />
+        <di:waypoint x="275" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="285" y="460" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_No_Sys_di" bpmnElement="Flow_No_Sys">
+        <di:waypoint x="325" y="540" />
+        <di:waypoint x="575" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_No_TH_di" bpmnElement="Flow_No_TH">
+        <di:waypoint x="675" y="540" />
+        <di:waypoint x="925" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_No_End_di" bpmnElement="Flow_No_End">
+        <di:waypoint x="975" y="580" />
+        <di:waypoint x="975" y="620" />
+      </bpmndi:BPMNEdge>
+
+      <!-- Rẽ nhánh Phê duyệt (Đi bọc lề trái X=160 để tránh cắt đường) -->
+      <bpmndi:BPMNEdge id="Flow_Yes_di" bpmnElement="Flow_Yes">
+        <di:waypoint x="250" y="425" />
+        <di:waypoint x="160" y="425" />
+        <di:waypoint x="160" y="740" />
+        <di:waypoint x="225" y="740" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="170" y="405" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Yes_Sys1_di" bpmnElement="Flow_Yes_Sys1">
+        <di:waypoint x="325" y="740" />
+        <di:waypoint x="575" y="740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Yes_Sys2_di" bpmnElement="Flow_Yes_Sys2">
+        <di:waypoint x="625" y="780" />
+        <di:waypoint x="625" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Yes_End_di" bpmnElement="Flow_Yes_End">
+        <di:waypoint x="675" y="860" />
+        <di:waypoint x="957" y="860" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

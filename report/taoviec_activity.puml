@@ -1,0 +1,52 @@
+@startuml
+skinparam monochrome true
+
+|Người dùng|
+start
+:Chọn chức năng "Tạo công việc";
+
+|Hệ thống|
+:Hiển thị biểu mẫu khởi tạo công việc;
+
+repeat
+
+  |Người dùng|
+  :Nhập/chỉnh sửa thông tin\n(Tên CV, Mô tả, Thời hạn, Ưu tiên...);
+
+  if (Lựa chọn thao tác?) then (Nhấn "Hủy")
+
+    |Hệ thống|
+    :Đóng biểu mẫu, không lưu dữ liệu;
+    stop
+
+  else (Nhấn "Xác nhận")
+
+    |Hệ thống|
+    :Kiểm tra tính hợp lệ của dữ liệu;
+
+    if (Kết quả kiểm tra?) then (Hợp lệ)
+
+      :Lưu dữ liệu công việc vào CSDL;
+      :Hiển thị thông báo tạo thành công;
+      :Đóng biểu mẫu và cập nhật danh sách;
+      stop
+
+    else (Không hợp lệ)
+
+      if (Phân loại lỗi?) then (Thiếu thông tin)
+
+        :Hiển thị lỗi màu đỏ tại\ncác trường bắt buộc bị trống;
+
+      else (Deadline quá khứ)
+
+        :Hiển thị cảnh báo thời hạn\nkhông hợp lệ (nhỏ hơn hiện tại);
+
+      endif
+
+    endif
+
+  endif
+
+repeat while (Dữ liệu không hợp lệ?) is (Nhập lại)
+
+@enduml
